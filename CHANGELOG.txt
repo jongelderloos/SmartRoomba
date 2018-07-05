@@ -1,3 +1,6 @@
+Keeping this for historical info, from now on the change log is the
+commit history.
+
 Changes in Roombacomm 0.97
 - I added support for frontal IR sensors.
 

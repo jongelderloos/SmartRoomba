@@ -1,3 +1,7 @@
+SmartRoomba: Making non WiFi Roombas smart through serial port control.
+
+Credit to the creators of RoombaComm on which the project is based and
+forked from.
 RoombaComm: Roomba Control & Communications API, release 0.96
 Copyright (c) 2006-9   Tod E. Kurt, tod-at-todbot.com &
                        Paul Bouchier,  bouchier-at-classicnet.net
@@ -12,7 +16,7 @@ one of the examples:
 % cd roombacomm
 % ./run-it.sh roombacomm.SimpleTest /dev/cu.KeySerial1
 
-Assuming you have a serial device called "/dev/cu.KeySerial1", which you 
+Assuming you have a serial device called "/dev/cu.KeySerial1", which you
 probably do if you have a Keyspan USA-19HS USB serial adapter.
 
 
