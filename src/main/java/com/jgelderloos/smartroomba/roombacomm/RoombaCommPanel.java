@@ -24,6 +24,7 @@ package com.jgelderloos.smartroomba.roombacomm;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.net.URL;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
@@ -344,7 +345,7 @@ public class RoombaCommPanel extends JPanel implements ActionListener,ChangeList
         JPanel ctrlPanel1 = new JPanel(new GridLayout(3,3));
 
         JButton but_turnleft =
-            new JButton(createImageIcon("src/main/com/jgelderloos/smartroomba/roombacomm/images/but_turnleft.png","turnleft"));
+            new JButton(createImageIcon("images/but_turnleft.png","turnleft"));
         ctrlPanel1.add( but_turnleft );
         JButton but_forward =
             new JButton(createImageIcon("images/but_forward.png","forward"));
@@ -483,10 +484,11 @@ public class RoombaCommPanel extends JPanel implements ActionListener,ChangeList
     }
 
     /** Returns an ImageIcon, or null if the path was invalid. */
-    protected static ImageIcon createImageIcon(String path,
+    protected ImageIcon createImageIcon(String path,
                                                String description) {
         // yes, this is supposed to say "RoombaCommTest"
-        java.net.URL imgURL = RoombaCommPanel.class.getResource(path);
+        //URL imgURL = RoombaCommPanel.class.getResource(path);
+        URL imgURL = getClass().getClassLoader().getResource(path);
         if (imgURL != null) {
             return new ImageIcon(imgURL, description);
         } else {

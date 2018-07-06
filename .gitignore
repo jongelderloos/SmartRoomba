@@ -5,11 +5,11 @@
 
 # Ide Files
 .idea
+out
 
 # Build Files / folders
 build
 .gradle
-!gradle-wrapper.jar
 
 
 # Package Files #
