@@ -20,7 +20,7 @@
  *
  */
 
-package roombacomm;
+package com.jgelderloos.smartroomba.roombacomm;
 
 /**
  *  A simple test of RoombaComm and RoombaCommSerial functionality.

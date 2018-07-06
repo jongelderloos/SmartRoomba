@@ -20,9 +20,9 @@
  *
  */
 
-package roombacomm.net;
+package com.jgelderloos.smartroomba.roombacomm.net;
 
-import roombacomm.*;
+import com.jgelderloos.smartroomba.roombacomm.*;
 
 /**
  *  A simple test of RoombaComm and RoombaCommSerial functionality.

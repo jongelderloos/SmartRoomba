@@ -20,7 +20,7 @@
  *
  */
 
-package roombacomm;
+package com.jgelderloos.smartroomba.roombacomm;
 
 /**
   Drive the Roomba in a Waggle, like when it's searching for something

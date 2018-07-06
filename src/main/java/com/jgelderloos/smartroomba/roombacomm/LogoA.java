@@ -20,7 +20,7 @@
  *
  */
 
-package roombacomm;
+package com.jgelderloos.smartroomba.roombacomm;
 
 /**
  Some example Logo-like things to do

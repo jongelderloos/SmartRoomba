@@ -1,5 +1,5 @@
 
-package roombacomm;
+package com.jgelderloos.smartroomba.roombacomm;
 
 /**
  * Simple wrapper for musical notes

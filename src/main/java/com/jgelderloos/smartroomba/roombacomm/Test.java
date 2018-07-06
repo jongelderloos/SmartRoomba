@@ -21,7 +21,7 @@
  */
 
 
-package roombacomm;
+package com.jgelderloos.smartroomba.roombacomm;
 
 
 /**

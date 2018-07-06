@@ -1,4 +1,4 @@
-package roombacomm;
+package com.jgelderloos.smartroomba.roombacomm;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

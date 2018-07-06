@@ -20,7 +20,7 @@
  *
  */
 
-package roombacomm;
+package com.jgelderloos.smartroomba.roombacomm;
 
 /**
  * The abstract base for all Roomba communications.

@@ -1,8 +1,8 @@
 
-package roombacomm;
+package com.jgelderloos.smartroomba.roombacomm;
 
 import java.lang.reflect.*;
-import roombacomm.*;
+import com.jgelderloos.smartroomba.roombacomm.*;
 
 
 public class DumpMethods {

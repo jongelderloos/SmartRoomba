@@ -5,7 +5,7 @@
 //
 //
 
-package roombacomm;
+package com.jgelderloos.smartroomba.roombacomm;
 
 import java.awt.*;
 import java.awt.event.*;

@@ -20,7 +20,7 @@
  *
  */
 
-package roombacomm;
+package com.jgelderloos.smartroomba.roombacomm;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -344,7 +344,7 @@ public class RoombaCommPanel extends JPanel implements ActionListener,ChangeList
         JPanel ctrlPanel1 = new JPanel(new GridLayout(3,3));
 
         JButton but_turnleft =
-            new JButton(createImageIcon("images/but_turnleft.png","turnleft"));
+            new JButton(createImageIcon("src/main/com/jgelderloos/smartroomba/roombacomm/images/but_turnleft.png","turnleft"));
         ctrlPanel1.add( but_turnleft );
         JButton but_forward =
             new JButton(createImageIcon("images/but_forward.png","forward"));

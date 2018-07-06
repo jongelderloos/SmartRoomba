@@ -1,7 +1,7 @@
 
 
 
-package roombacomm;
+package com.jgelderloos.smartroomba.roombacomm;
 
 import java.util.*;
 import java.util.regex.*;

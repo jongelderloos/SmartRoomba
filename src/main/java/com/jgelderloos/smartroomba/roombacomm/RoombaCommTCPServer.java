@@ -22,7 +22,7 @@
  */
 
 
-package roombacomm;
+package com.jgelderloos.smartroomba.roombacomm;
 
 import java.net.*;
 import java.io.*;
