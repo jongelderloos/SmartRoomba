@@ -22,6 +22,8 @@
 
 package com.jgelderloos.smartroomba.roombacomm;
 
+import com.jgelderloos.smartroomba.songs.Note;
+
 /**
  * The abstract base for all Roomba communications.
  * 

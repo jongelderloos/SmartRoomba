@@ -20,7 +20,9 @@
  *
  */
 
-package com.jgelderloos.smartroomba.roombacomm;
+package com.jgelderloos.smartroomba.songs;
+
+import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
 
 import java.util.*;
 

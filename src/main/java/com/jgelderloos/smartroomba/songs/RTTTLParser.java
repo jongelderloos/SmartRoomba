@@ -1,7 +1,9 @@
 
 
 
-package com.jgelderloos.smartroomba.roombacomm;
+package com.jgelderloos.smartroomba.songs;
+
+import com.jgelderloos.smartroomba.songs.Note;
 
 import java.util.*;
 import java.util.regex.*;

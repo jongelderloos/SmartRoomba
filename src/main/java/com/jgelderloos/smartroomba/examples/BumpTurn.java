@@ -1,5 +1,5 @@
 /*
- * roombacomm.Spiral -- test out the DRIVE command, showing a spiral
+ * roombacomm.BumpTurn -- turn away from bumps
  *
  *  Copyright (c) 2006 Tod E. Kurt, tod@todbot.com, ThingM
  *
@@ -20,91 +20,92 @@
  *
  */
 
+package com.jgelderloos.smartroomba.examples;
 
-package com.jgelderloos.smartroomba.roombacomm;
+import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
 
 import java.io.*;
 
 /**
-   Make the Roomab drive in a spiral.
-  <p>
+   Read sensors to detect bumps and turn away from them while driving
+   <p>
    Run it with something like: <pre>
-    java roombacomm.Spiral /dev/cu.KeySerial1<br>
-    Usage: 
-      roombacomm.Spiral <serialportname> [protocol] [options]<br>
-    where: protocol (optional) is SCI or OI
-    [options] can be one or more of:
-     -debug       -- turn on debug output
-     -hwhandshake -- use hardware-handshaking, for Windows Bluetooth
-     -nohwhandshake -- don't use hardware-handshaking
-  </pre>
+    java roombacomm.BumpTurn /dev/cu.KeySerial1<br>
+   Usage: 
+   roombacomm.Drive serialportname [protocol] [options]
+   where:
+   protocol (optional) is SCI or OI
+   [options] can be one or more of:
+   -debug       -- turn on debug output
+   -hwhandshake -- use hardware-handshaking, for Windows Bluetooth
+   -nohwhandshake -- don't use hardware-handshaking
+   </pre>
  
- */
-public class Spiral {
+*/ 
+public class BumpTurn {
     
     static String usage = 
         "Usage: \n"+
-        "  roombacomm.Spiral <serialportname> [protocol] [options]\n" +
-        "where: protocol (optional) is SCI or OI\n" +
-        "[options] can be one or more of:\n"+
+        "  roombacomm.Drive <serialportname> [protocol]" +
+        "" +
+        " [options]\n" +
+        "where protocol (optional) is SCI or OI and [options] can be one or more of:\n"+
         " -debug       -- turn on debug output\n"+
         " -hwhandshake -- use hardware-handshaking, for Windows Bluetooth\n"+
-        " -nohwhandshake -- don't use hardware-handshaking\n"+
+        "nohwhandshake -- don't use hardware-handshaking" +
         "\n";
     static boolean debug = false;
     static boolean hwhandshake = false;
 
     public static void main(String[] args) {
-        if( args.length == 0 ) {
+        if( args.length < 1 ) {
             System.out.println( usage );
             System.exit(0);
         }
+
         String portname = args[0];  // e.g. "/dev/cu.KeySerial1"
         RoombaCommSerial roombacomm = new RoombaCommSerial();
-        for( int i=1; i<args.length; i++ ) {
+        for( int i=1; i < args.length; i++ ) {
         	if (args[i].equals("SCI") || (args[i].equals("OI"))) {
         		roombacomm.setProtocol(args[i]);
-        	} else if( args[i].endsWith("debug") ) 
+        	} else if( args[i].endsWith("debug") )
                 debug = true;
             else if( args[i].endsWith("nohwhandshake") )
                 roombacomm.setWaitForDSR(false);
             else if( args[i].endsWith("hwhandshake") )
                 roombacomm.setWaitForDSR(true);
         }
+
         roombacomm.debug = debug;
-        
+
         if( ! roombacomm.connect( portname ) ) {
             System.out.println("Couldn't connect to "+portname);
             System.exit(1);
-        }
+        }      
         
         System.out.println("Roomba startup");
         roombacomm.startup();
-        roombacomm.pause(100);
         roombacomm.control();
         roombacomm.pause(100);
 
-        int pausetime = 500;
-        int speed = 100;
-        int r = 10;
-        int dr = 20;
-        int rmax = 1000;
+        roombacomm.updateSensors();
 
         System.out.println("Press return to exit.");
         boolean done = false;
-        while( !done ) { 
-            System.out.println("r:"+r);
-
-            roombacomm.drive( speed, r );
-            r += dr;
-            if( Math.abs(r) > 410 ) {
-                speed = speed;
-                dr = -dr;
+        while( !done ) {
+            if( roombacomm.bumpLeft() ) {
+                roombacomm.spinRight(90);
             }
-
-            done = keyIsPressed();
+            else if( roombacomm.bumpRight() ) {
+                roombacomm.spinLeft(90);
+            }
+            else if( roombacomm.wall() ) { 
+                roombacomm.playNote( 72,10 );  // beep!
+            }
+            roombacomm.goForward();
+            roombacomm.updateSensors();
             
-            roombacomm.pause( pausetime );
+            done = keyIsPressed();
         }
         
         roombacomm.stop();
@@ -127,3 +128,4 @@ public class Spiral {
         return press;
     }
 }
+

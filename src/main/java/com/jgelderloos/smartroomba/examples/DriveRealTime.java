@@ -20,7 +20,9 @@
  *
  */
 
-package com.jgelderloos.smartroomba.roombacomm;
+package com.jgelderloos.smartroomba.examples;
+
+import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
 
 import javax.swing.*;
 import java.awt.*;

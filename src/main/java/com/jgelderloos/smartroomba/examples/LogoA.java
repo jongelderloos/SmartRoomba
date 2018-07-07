@@ -20,7 +20,10 @@
  *
  */
 
-package com.jgelderloos.smartroomba.roombacomm;
+package com.jgelderloos.smartroomba.examples;
+
+import com.jgelderloos.smartroomba.roombacomm.RoombaComm;
+import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
 
 /**
  Some example Logo-like things to do

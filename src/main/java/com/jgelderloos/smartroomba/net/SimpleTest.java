@@ -1,5 +1,5 @@
 /*
- * roombacomm.SimpleTest
+ * roombacomm.net.SimpleTest
  *
  *  Copyright (c) 2005 Tod E. Kurt, tod@todbot.com
  *
@@ -20,22 +20,15 @@
  *
  */
 
-package com.jgelderloos.smartroomba.roombacomm;
+package com.jgelderloos.smartroomba.net;
+
+import com.jgelderloos.smartroomba.roombacomm.*;
 
 /**
-   A simple test of RoombaComm and RoombaCommSerial functionality.
-  <p>
-   Run it with something like: <pre>
-    java roombacomm.SimpleTest /dev/cu.KeySerial1<br>
-    Usage:
-      roombacomm.SimpleTest serialportname [protocol] [options]<br>
-    where:
-    protocol (optional) is SCI or OI
-    [options] can be one or more of:
-     -debug       -- turn on debug output
-     -hwhandshake -- use hardware-handshaking, for Windows Bluetooth
-     -nohwhandshake -- don't use hardware-handshaking
-     -flush       -- flush on sends(), normally not needed
+ *  A simple test of RoombaComm and RoombaCommSerial functionality.
+ * <p>
+ *  Run it with something like: <pre>
+ *   java roombacomm.SimpleTest /dev/cu.KeySerial1
  *  </pre>
  *
  */
@@ -43,14 +36,11 @@ public class SimpleTest {
     
     static String usage = 
         "Usage: \n"+
-        "  roombacomm.SimpleTest <serialportname> [protocol] [options]\n" +
-        "where:\n"+
-        "protocol (optional) is SCI or OI\n"+
-        "[options] can be one or more of:\n"+
+        "  roombacomm.net.SimpleTest <host:port> [options]\n" +
+        "where [options] can be one or more of:\n"+
         " -debug       -- turn on debug output\n"+
-        " -hwhandshake -- use hardware-handshaking, for Windows Bluetooth\n"+
-        " -nohwhandshake -- don't use hardware-handshaking\n"+
-        " -flush       -- flush on sends(), normally not needed\n"+
+        //" -hwhandshake -- use hardware-handshaking, for Windows Bluetooth\n"+
+        //" -flush       -- flush on sends(), normally not needed\n"+
         "\n";
     static boolean debug = false;
     static boolean hwhandshake = false;
@@ -63,23 +53,21 @@ public class SimpleTest {
         }
 
         String portname = args[0];  // e.g. "/dev/cu.KeySerial1"
-        RoombaCommSerial roombacomm = new RoombaCommSerial();
+
         for( int i=1; i < args.length; i++ ) {
-        	if (args[i].equals("SCI") || (args[1].equals("OI"))) {
-        		roombacomm.setProtocol(args[i]);
-        	} else if( args[i].endsWith("debug") )
+            if( args[i].endsWith("debug") )
                 debug = true;
-            else if( args[i].endsWith("nohwhandshake") )
-                roombacomm.setWaitForDSR(false);
-            else if( args[i].endsWith("hwhandshake") )
-                roombacomm.setWaitForDSR(true);
-            else if( args[i].endsWith("flush") )
-                flush = true;
+            //else if( args[i].endsWith("hwhandshake") )
+            //    hwhandshake = true;
+            //else if( args[i].endsWith("flush") )
+            //    flush = true;
         }
         
+        RoombaComm roombacomm = new RoombaCommTCPClient();
 
         roombacomm.debug = debug;
-        roombacomm.flushOutput = flush;
+        //roombacomm.waitForDSR = hwhandshake;
+        //roombacomm.flushOutput = flush;
         
         String portlist[] = roombacomm.listPorts();
         System.out.println("Available ports:");
@@ -130,11 +118,6 @@ public class SimpleTest {
         System.out.println("Moving via send()");
         byte cmd[] = {(byte)RoombaComm.DRIVE, 
                       (byte)0x00,(byte)0xfa, (byte)0x00,(byte)0x00};
-        roombacomm.send( cmd ) ;
-        roombacomm.pause(1000);
-        roombacomm.stop();
-        cmd[1] = (byte)0xff;
-        cmd[2] = (byte)0x05;
         roombacomm.send( cmd ) ;
         roombacomm.pause(1000);
         roombacomm.stop();

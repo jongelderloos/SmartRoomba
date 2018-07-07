@@ -1,5 +1,5 @@
 
-package com.jgelderloos.smartroomba.roombacomm;
+package com.jgelderloos.smartroomba.songs;
 
 /**
  * Simple wrapper for musical notes

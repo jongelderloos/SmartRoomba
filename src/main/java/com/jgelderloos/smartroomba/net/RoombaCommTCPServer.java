@@ -22,7 +22,7 @@
  */
 
 
-package com.jgelderloos.smartroomba.roombacomm.net;
+package com.jgelderloos.smartroomba.net;
 
 import java.net.*;
 import java.io.*;

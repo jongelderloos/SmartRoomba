@@ -21,8 +21,10 @@
  */
 
 
-package com.jgelderloos.smartroomba.roombacomm;
+package com.jgelderloos.smartroomba.examples;
 
+
+import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
 
 /**
   A fairly thorough test of the RoombaComm API.

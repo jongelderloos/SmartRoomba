@@ -1,5 +1,5 @@
 /*
- * roombacomm.Waggle -- test out the DRIVE command, showing a waggle
+ * roombacomm.Drive -- test out the DRIVE command
  *
  *  Copyright (c) 2006 Tod E. Kurt, tod@todbot.com, ThingM
  *
@@ -20,29 +20,34 @@
  *
  */
 
-package com.jgelderloos.smartroomba.roombacomm;
+package com.jgelderloos.smartroomba.examples;
+
+import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
 
 /**
-  Drive the Roomba in a Waggle, like when it's searching for something
-  <p>
-  Run it with something like: <pre>
-   java roombacomm.Waggle /dev/cu.KeySerial1 [protocol] velocity radius waittime [options]
-  where: 
-  protocol (optional) is SCI or OI
-  velocity and radius in mm, waittime in milliseconds
-  [options] can be one or more of:
-   -debug       -- turn on debug output
-   -hwhandshake -- use hardware-handshaking, for Windows Bluetooth
-   -nohwhandshake -- don't use hardware-handshaking
+ *  A program for driving Roomba.
+ * <p>
+ *  Run it with something like: <pre>
+ *   java roombacomm.Drive /dev/cu.KeySerial1 byte1 byte2 byte3 byte4<br>
+ *  Usage:
+ *  roombacomm.Drive serialportname [protocol] velocity radius waittime [options]<br>
+ *  where protocol (optional) is SCI or OI 
+ *  velocity is in mm/sec
+ *  radius is mm from the centerpoint
+ *  waittime is in milliseconds
+ *  [options] can be one or more of:
+ *  -debug       -- turn on debug output
+ *  -hwhandshake -- use hardware-handshaking, for Windows Bluetooth
+ *  -nohwhandshake -- don't use hardware-handshaking
  *  </pre>
  *
  */
-public class Waggle {
+public class Drive {
     
     static String usage = 
         "Usage: \n"+
-        "  roombacomm.Waggle <serialportname> [protocol] <velocity> <radius> <waittime> [options]\n" +
-        "where: protocol (optional) is SCI or OI\n" +
+        "  roombacomm.Drive <serialportname> [protocol] <velocity> <radius> <waittime> [options]\n" +
+        "where protocol (optional) is SCI or OI\n" +
         "[options] can be one or more of:\n"+
         " -debug       -- turn on debug output\n"+
         " -hwhandshake -- use hardware-handshaking, for Windows Bluetooth\n"+
@@ -52,29 +57,46 @@ public class Waggle {
     static boolean hwhandshake = false;
 
     public static void main(String[] args) {
+    	new Drive(args);
+    }
+    
+    Drive(String[] args)
+    {
+    	int argIndx;
+    	String portname, protocol;
         if( args.length < 4 ) {
             System.out.println( usage );
             System.exit(0);
         }
 
-        String portname = args[0];  // e.g. "/dev/cu.KeySerial1"
+        /*
+         * Parse port & protocol
+         */
+        portname = args[0];  // e.g. "/dev/cu.KeySerial1"
         RoombaCommSerial roombacomm = new RoombaCommSerial();
         int argOffset = 0;
         if (args[1].equals("SCI") || (args[1].equals("OI"))) {
         	roombacomm.setProtocol(args[1]);
         	argOffset = 1;
         }
-
+        
+     	/*
+    	 * Parse command arguments
+    	 */
         int velocity=0, radius=0, waittime=0;
         try { 
-            velocity = Integer.parseInt( args[1+argOffset] );
+			velocity = Integer.parseInt( args[1+argOffset] );	// velocity would be the 1st numeric
             radius   = Integer.parseInt( args[2+argOffset] );
             waittime = Integer.parseInt( args[3+argOffset] );
         } catch( Exception e ) {
-            System.err.println("Couldn't parse velocity or radius or waittime");
+            System.err.println("Couldn't parse velocity, radius, or waittime");
             System.exit(1);
         }
 
+        
+        /*
+         * Parse options
+         */
         for( int i=4+argOffset; i < args.length; i++ ) {
             if( args[i].endsWith("debug") )
                 debug = true;
@@ -86,23 +108,27 @@ public class Waggle {
 
         roombacomm.debug = debug;
 
-        if( ! roombacomm.connect( portname ) ) {
+        if( ! roombacomm.connect( roombacomm.getPortname())) {
             System.out.println("Couldn't connect to "+portname);
             System.exit(1);
-        }      
+        } 
+        System.out.println("Using port: " + roombacomm.getPortname() + " protocol: " 
+        		+ roombacomm.getProtocol() + " velocity: " + velocity + " radius: "
+        		+ radius + " waittime: " + waittime + "\n");
         
         System.out.println("Roomba startup");
         roombacomm.startup();
-        roombacomm.control();
         roombacomm.pause(100);
+        roombacomm.control();
+        roombacomm.playNote( 72, 10 );  // C , test note
+        roombacomm.pause( 200 );
+        if( roombacomm.updateSensors() )
+            System.out.println("Roomba found!\n");
+        else
+            System.out.println("No Roomba. :(  Is it turned on?\n");
 
-        System.out.println("waggling 5 times\n");
-        for( int i=0; i<5; i++ ) {
-            roombacomm.drive( velocity, radius );
-            roombacomm.pause(waittime);
-            roombacomm.drive( velocity, -radius );
-            roombacomm.pause(waittime);
-        }
+        roombacomm.drive( velocity, radius );
+        roombacomm.pause(waittime);
         roombacomm.stop();
 
         System.out.println("Disconnecting");
