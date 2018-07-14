@@ -1,7 +1,8 @@
 /*
- * roombacomm.Drive -- test out the DRIVE command
+ *  Drive -- test out the DRIVE command
  *
  *  Copyright (c) 2006 Tod E. Kurt, tod@todbot.com, ThingM
+ *  Copyright (c) 2018 Jon Gelderloos
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

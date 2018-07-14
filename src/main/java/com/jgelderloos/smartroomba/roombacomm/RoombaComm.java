@@ -2,6 +2,7 @@
  *  RoombaComm Interface
  *
  *  Copyright (c) 2006 Tod E. Kurt, tod@todbot.com, ThingM
+ *  Copyright (c) 2018 Jon Gelderloos
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -393,10 +394,6 @@ public abstract class RoombaComm {
 	public void sensors() {
 		sensors(SENSORS_ALL);
 	}
-
-    public void mostSensors() {
-        sensors(SENSORS_MOST);
-    }
 
 	public void allSensors() {
 		sensors(SENSORS_ALL_REAL);

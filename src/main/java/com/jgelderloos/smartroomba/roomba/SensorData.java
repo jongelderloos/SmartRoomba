@@ -1,5 +1,5 @@
 /*
- *  SmartRoomba
+ *  SmartRoomba - SensorData
  *
  *  Copyright (c) 2018 Jon Gelderloos
  *
@@ -25,6 +25,7 @@ package com.jgelderloos.smartroomba.roomba;
 import java.time.LocalDateTime;
 
 public class SensorData {
+    public static final int MAX_SENSOR_BYTES = 93; // 93 bytes returned when requesting all packets
 
     // Sensor packet indicies
     public enum PacketOffsets {
@@ -108,16 +109,27 @@ public class SensorData {
         SIDE_BRUSH_MOTOR_CURRENT_HI,
         SIDE_BRUSH_MOTOR_CURRENT_LO,
         STASIS,
+        UNKNOWN1,
+        UNKNOWN2,
+        UNKNOWN3,
+        UNKNOWN4,
+        UNKNOWN5,
+        UNKNOWN6,
+        UNKNOWN7,
+        UNKNOWN8,
+        UNKNOWN9,
+        UNKNOWN10,
+        UNKNOWN11,
+        UNKNOWN12,
+        UNKNOWN13
     }
 
-    // TODO: make an array of bytes and index into each. this is all private data anyways, the access methods are
-    // whats important.
     private byte[] sensorData;
     private LocalDateTime dateTime;
 
     public SensorData(byte[] data, int dataLength) {
         dateTime = LocalDateTime.now();
-        sensorData = new byte[100];
+        sensorData = new byte[MAX_SENSOR_BYTES];
         System.arraycopy(data, 0, sensorData, 0, dataLength);
     }
 
@@ -125,17 +137,32 @@ public class SensorData {
         return sensorData;
     }
 
-    public String getRawDataAsString() {
+    public String getRawDataAsCSVString() {
         StringBuilder stringBuilder = new StringBuilder();
+        int i = 0;
         for (byte b : sensorData) {
             stringBuilder.append("0x");
             stringBuilder.append(String.format("%02X", b));
-            stringBuilder.append(", ");
+            if (i++ != sensorData.length - 1) {
+                stringBuilder.append(",");
+            }
         }
         return stringBuilder.toString();
     }
 
     public LocalDateTime getDateTime() {
         return dateTime;
+    }
+
+    public String getDataHeaderAsCSVString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        int i = 0;
+        for (PacketOffsets packet: PacketOffsets.values()) {
+            stringBuilder.append(packet.toString());
+            if (i++ != PacketOffsets.values().length - 1) {
+                stringBuilder.append(",");
+            }
+        }
+        return stringBuilder.toString();
     }
 }

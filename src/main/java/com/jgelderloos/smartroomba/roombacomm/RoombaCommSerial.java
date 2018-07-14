@@ -2,6 +2,7 @@
  *  RoombaComm Serial Interface
  *
  *  Copyright (c) 2006 Tod E. Kurt, tod@todbot.com, ThingM
+ *  Copyright (c) 2018 Jon Gelderloos
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,6 +24,7 @@
 package com.jgelderloos.smartroomba.roombacomm;
 
 import com.jgelderloos.smartroomba.roomba.SensorData;
+import com.jgelderloos.smartroomba.utilities.DataCSV;
 import gnu.io.*;
 import java.io.*;
 import java.util.*;
@@ -55,6 +57,8 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     static final int stopbits = SerialPort.STOPBITS_1;
     private String protocol = "SCI";
     public Queue<SensorData> sensorDataQueue;
+    public FileWriter fileWriter;
+    public DataCSV dataCsv;
 
     /**
      * contains a list of all the ports
@@ -118,24 +122,44 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
         return false;
     }
 
-    // constructor
     public RoombaCommSerial() {
         super();
         makePorts();
+        // TODO: fix config file
         //readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
+        try {
+            fileWriter = new FileWriter("D:\\Jon Stuff\\Projects\\SmartRoomba\\data\\TestCSV.csv");
+        } catch (IOException e) {
+            System.out.println("IOException while opening CSV data file");
+        }
+        dataCsv = new DataCSV(fileWriter);
     }
+
     public RoombaCommSerial(boolean autoupdate) {
         super(autoupdate);
         makePorts();
         readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
+        try {
+            fileWriter = new FileWriter("D:\\Jon Stuff\\Projects\\SmartRoomba\\data\\TestCSV.csv");
+        } catch (IOException e) {
+            System.out.println("IOException while opening CSV data file");
+        }
+        dataCsv = new DataCSV(fileWriter);
     }
+
     public RoombaCommSerial(boolean autoupdate, int updateTime) {
         super(autoupdate, updateTime);
         makePorts();
         readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
+        try {
+            fileWriter = new FileWriter("D:\\Jon Stuff\\Projects\\SmartRoomba\\data\\TestCSV.csv");
+        } catch (IOException e) {
+            System.out.println("IOException while opening CSV data file");
+        }
+        dataCsv = new DataCSV(fileWriter);
     }
 
     void makePorts() {
@@ -242,8 +266,6 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     public boolean updateSensors() {
         sensorsValid = false;
         allSensors();
-        //mostSensors();
-        //sensors();
         for(int i=0; i < 20; i++) {
             if( sensorsValid ) { 
                 logmsg("updateSensors: sensorsValid!");
@@ -393,9 +415,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
         try {
             Enumeration portList = CommPortIdentifier.getPortIdentifiers();
             while (portList.hasMoreElements()) {
-                CommPortIdentifier portId =
-                    (CommPortIdentifier) portList.nextElement();
-                
+                CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
                 if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
                     System.out.println("found " + portId.getName());
                     if (portId.getName().equals(portname)) {
@@ -422,7 +442,6 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
                     }
                 }
             }
-      
         } catch (Exception e) {
             logmsg("connect failed: "+e);
             port = null;
@@ -439,9 +458,8 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
      */
     synchronized public void serialEvent(SerialPortEvent serialEvent) {
         try {
-        logmsg("serialEvent:"+serialEvent+", available:"+input.available());
-        //System.out.println("serialEvent:"+serialEvent+" type: " + serialEvent.getEventType() + ", available:"+input.available() + ", RequestLength: " + super.readRequestLength);
-        if (serialEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+            logmsg("serialEvent:"+serialEvent+", available:"+input.available());
+            if (serialEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
                 // input.available does not always add up to the total bytes being read, sometime more data becomes available
                 // during the while loop
                 while (input.available() > 0) {
@@ -449,22 +467,14 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
                     if( bufferLast == super.readRequestLength) {
                         bufferLast = 0;
                         System.arraycopy(buffer, 0, sensor_bytes, 0, super.readRequestLength);
+                        // TODO: possibly think of a way to init SensorData when we get the first packet so
+                        // the timestamp is more accurate
                         SensorData sensorData = new SensorData(buffer, super.readRequestLength);
                         sensorDataQueue.add(sensorData);
                         computeSensors();
                     }
-                    /*
-                    synchronized (buffer) {
-                        if (bufferLast == buffer.length) {
-                            byte temp[] = new byte[bufferLast << 1];
-                            System.arraycopy(buffer, 0, temp, 0, bufferLast);
-                            buffer = temp;
-                        }
-                        buffer[bufferLast++] = (byte) input.read();
-                    }
-                    */
-                } // while
-        }
+                }
+            }
         } catch (IOException e) {
             errorMessage("serialEvent", e);
         }

@@ -1,7 +1,8 @@
 /*
- * roombacomm.net.SimpleTest
+ *  SimpleTest
  *
  *  Copyright (c) 2005 Tod E. Kurt, tod@todbot.com
+ *  Copyright (c) 2018 Jon Gelderloos
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
