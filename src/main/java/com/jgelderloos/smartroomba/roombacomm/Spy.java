@@ -23,6 +23,8 @@
 
 package com.jgelderloos.smartroomba.roombacomm;
 
+import com.jgelderloos.smartroomba.roomba.SensorData;
+
 import java.io.*;
 
 /**
@@ -115,9 +117,17 @@ public class Spy {
                 continue;
             }
 
-            System.out.println( System.currentTimeMillis() + ":"+ 
-                                roombacomm.sensorsAsString() );
-            
+            //System.out.println( System.currentTimeMillis() + ":"+ roombacomm.sensorsAsString() );
+            boolean dataAvailable = true;
+            while (dataAvailable) {
+                SensorData sensorData = roombacomm.sensorDataQueue.poll();
+                if (sensorData != null) {
+                    System.out.println(sensorData.getRawDataAsString());
+                } else {
+                    dataAvailable = false;
+                }
+            }
+
             roombacomm.pause( pausetime );
         }
         System.out.println("Disconnecting");

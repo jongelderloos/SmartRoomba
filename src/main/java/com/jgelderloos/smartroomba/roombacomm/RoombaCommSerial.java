@@ -22,9 +22,11 @@
 
 package com.jgelderloos.smartroomba.roombacomm;
 
+import com.jgelderloos.smartroomba.roomba.SensorData;
 import gnu.io.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 /**
@@ -52,6 +54,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     static final int parity   = SerialPort.PARITY_NONE;
     static final int stopbits = SerialPort.STOPBITS_1;
     private String protocol = "SCI";
+    public Queue<SensorData> sensorDataQueue;
 
     /**
      * contains a list of all the ports
@@ -119,17 +122,20 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     public RoombaCommSerial() {
         super();
         makePorts();
-        readConfigFile();
+        //readConfigFile();
+        sensorDataQueue = new ConcurrentLinkedQueue<>();
     }
     public RoombaCommSerial(boolean autoupdate) {
         super(autoupdate);
         makePorts();
         readConfigFile();
+        sensorDataQueue = new ConcurrentLinkedQueue<>();
     }
     public RoombaCommSerial(boolean autoupdate, int updateTime) {
         super(autoupdate, updateTime);
         makePorts();
         readConfigFile();
+        sensorDataQueue = new ConcurrentLinkedQueue<>();
     }
 
     void makePorts() {
@@ -235,7 +241,9 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
      */
     public boolean updateSensors() {
         sensorsValid = false;
-        sensors();
+        allSensors();
+        //mostSensors();
+        //sensors();
         for(int i=0; i < 20; i++) {
             if( sensorsValid ) { 
                 logmsg("updateSensors: sensorsValid!");
@@ -349,7 +357,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
 		}
 		this.protocol = protocol;
 		logmsg("Protocol: " + protocol);
-		writeConfigFile(portname, protocol, waitForDSR?'Y':'N');
+		//writeConfigFile(portname, protocol, waitForDSR?'Y':'N');
 	}
 
 	public boolean isWaitForDSR() {
@@ -431,13 +439,18 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
      */
     synchronized public void serialEvent(SerialPortEvent serialEvent) {
         try {
-        logmsg("serialEvent:"+serialEvent+", nvailable:"+input.available());
+        logmsg("serialEvent:"+serialEvent+", available:"+input.available());
+        //System.out.println("serialEvent:"+serialEvent+" type: " + serialEvent.getEventType() + ", available:"+input.available() + ", RequestLength: " + super.readRequestLength);
         if (serialEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+                // input.available does not always add up to the total bytes being read, sometime more data becomes available
+                // during the while loop
                 while (input.available() > 0) {
                     buffer[bufferLast++] = (byte) input.read();
                     if( bufferLast == super.readRequestLength) {
                         bufferLast = 0;
-                        System.arraycopy(buffer, 0, sensor_bytes, 0, super.readRequestLength);                    
+                        System.arraycopy(buffer, 0, sensor_bytes, 0, super.readRequestLength);
+                        SensorData sensorData = new SensorData(buffer, super.readRequestLength);
+                        sensorDataQueue.add(sensorData);
                         computeSensors();
                     }
                     /*

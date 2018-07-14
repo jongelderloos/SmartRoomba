@@ -326,7 +326,8 @@ public abstract class RoombaComm {
 			readRequestLength = 52;
 			break;
 		case 100:
-			readRequestLength = 80;
+		    // The spec says this packet group is 80 bytes but 93 bytes are being returned
+			readRequestLength = 93;
 			break;
 		case 101:
 			readRequestLength = 28;
@@ -390,8 +391,15 @@ public abstract class RoombaComm {
 	 * get all sensor data
 	 */
 	public void sensors() {
-		readRequestLength = 26;
 		sensors(SENSORS_ALL);
+	}
+
+    public void mostSensors() {
+        sensors(SENSORS_MOST);
+    }
+
+	public void allSensors() {
+		sensors(SENSORS_ALL_REAL);
 	}
 
 	/**
@@ -896,9 +904,29 @@ public abstract class RoombaComm {
 	}
 
 	/**
-	 * @return all sensor data as a string
+	 * @return some sensor data as a string
 	 */
 	public String sensorsAsString() {
+		String sd = "";
+		if (debug) {
+			sd = "\n";
+			for (int i = 0; i < 26; i++)
+				sd += " " + hex(sensor_bytes[i]);
+		}
+		return "bump:" + (bumpLeft() ? "l" : "_") + (bumpRight() ? "r" : "_") + " wheel:"
+				+ (wheelDropLeft() ? "l" : "_") + (wheelDropCenter() ? "c" : "_") + (wheelDropLeft() ? "r" : "_")
+				+ " wall:" + (wall() ? "Y" : "n") + " cliff:" + (cliffLeft() ? "l" : "_")
+				+ (cliffFrontLeft() ? "L" : "_") + (cliffFrontRight() ? "R" : "_") + (cliffRight() ? "r" : "_")
+				+ " dirtL:" + dirtLeft() + " dirtR:" + dirtRight() + " vwal:" + virtual_wall() + " motr:"
+				+ motor_overcurrents() + " dirt:" + dirt_left() + "," + dirt_right() + " remo:" + hex(remote_opcode())
+				+ " butt:" + hex(buttons()) + " dist:" + distance() + " angl:" + angle() + " chst:" + charging_state()
+				+ " volt:" + voltage() + " curr:" + current() + " temp:" + temperature() + " chrg:" + charge()
+				+ " capa:" + capacity() + sd;
+	}
+
+	// TODO: there are missing sensor values from the above method. They need to be added to this version
+	// TODO: return a structure that can be exported to a csv or something for recording
+	public String allSensorsAsString() {
 		String sd = "";
 		if (debug) {
 			sd = "\n";
@@ -1261,6 +1289,8 @@ public abstract class RoombaComm {
 	public static final int SENSORS_PHYSICAL = 1;
 	public static final int SENSORS_INTERNAL = 2;
 	public static final int SENSORS_POWER = 3;
+    public static final int SENSORS_MOST = 6;
+	public static final int SENSORS_ALL_REAL = 100;
 
 	public static final int REMOTE_NONE = 0xff;
 	public static final int REMOTE_POWER = 0x8a;
