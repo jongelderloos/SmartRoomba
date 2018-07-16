@@ -21,6 +21,7 @@ dependencies {
     // This dependency is found on compile classpath of this component and consumers.
     compile 'com.google.guava:guava:23.0'
 
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
     compile group: 'org.bidib.jbidib', name: 'jbidibc-rxtx-2.2', version: '1.6.0'
     compile group: 'org.bidib.jbidib', name: 'bidib-rxtx-binaries', version: '2.2'
 
