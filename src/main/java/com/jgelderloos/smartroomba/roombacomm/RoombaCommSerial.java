@@ -128,38 +128,32 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
         // TODO: fix config file
         //readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
-        try {
-            fileWriter = new FileWriter("D:\\Jon Stuff\\Projects\\SmartRoomba\\data\\TestCSV.csv");
-        } catch (IOException e) {
-            System.out.println("IOException while opening CSV data file");
-        }
-        dataCsv = new DataCSV(fileWriter);
+        dataCsv = new DataCSV(null);
     }
 
-    public RoombaCommSerial(boolean autoupdate) {
+    public RoombaCommSerial(DataCSV dataCSV) {
+        super();
+        makePorts();
+        // TODO: fix config file
+        //readConfigFile();
+        sensorDataQueue = new ConcurrentLinkedQueue<>();
+        this.dataCsv = dataCSV;
+    }
+
+    public RoombaCommSerial(DataCSV dataCSV, boolean autoupdate) {
         super(autoupdate);
         makePorts();
         readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
-        try {
-            fileWriter = new FileWriter("D:\\Jon Stuff\\Projects\\SmartRoomba\\data\\TestCSV.csv");
-        } catch (IOException e) {
-            System.out.println("IOException while opening CSV data file");
-        }
-        dataCsv = new DataCSV(fileWriter);
+        this.dataCsv = dataCSV;
     }
 
-    public RoombaCommSerial(boolean autoupdate, int updateTime) {
+    public RoombaCommSerial(DataCSV dataCSV, boolean autoupdate, int updateTime) {
         super(autoupdate, updateTime);
         makePorts();
         readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
-        try {
-            fileWriter = new FileWriter("D:\\Jon Stuff\\Projects\\SmartRoomba\\data\\TestCSV.csv");
-        } catch (IOException e) {
-            System.out.println("IOException while opening CSV data file");
-        }
-        dataCsv = new DataCSV(fileWriter);
+        this.dataCsv = dataCSV;
     }
 
     void makePorts() {

@@ -1,6 +1,7 @@
 package com.jgelderloos.smartroomba;
 
 import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
+import com.jgelderloos.smartroomba.utilities.DataCSV;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -8,6 +9,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class SmartRoombaMain {
 
@@ -30,9 +34,9 @@ public class SmartRoombaMain {
         hwhandshakeOption.setOptionalArg(true);
         options.addOption(hwhandshakeOption);
 
-        Option flushOption = new Option("f", "flush", false, "flush on serial sends");
-        flushOption.setOptionalArg(true);
-        options.addOption(flushOption);
+        Option recordOption = new Option("r", "record", true, "record sensor data");
+        recordOption.setOptionalArg(true);
+        options.addOption(recordOption);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -52,7 +56,7 @@ public class SmartRoombaMain {
             String pause = cmd.getOptionValue("pause", "500");
             boolean debug = cmd.hasOption("debug");
             boolean hwhandshake = cmd.hasOption("hwhandshake");
-            boolean flush = cmd.hasOption("flush");
+            String record = cmd.getOptionValue("record", null);
 
             int pauseTime = 500;
             try {
@@ -61,8 +65,17 @@ public class SmartRoombaMain {
                 System.out.println("pause must be an integer value. See usage for details");
             }
 
-            RoombaCommSerial roombaComm = new RoombaCommSerial();
-            SmartRoomba smartRoomba = new SmartRoomba(roombaComm, comport, pauseTime, debug, hwhandshake, flush);
+            FileWriter fileWriter = null;
+            try {
+                fileWriter = new FileWriter(record);
+            } catch (IOException e) {
+                System.out.println("Error, could not open the file for writing. " + record);
+            }
+            // TODO try out null object patter?
+            DataCSV dataCSV = new DataCSV(fileWriter);
+            RoombaCommSerial roombaComm = new RoombaCommSerial(dataCSV);
+            SmartRoomba smartRoomba = new SmartRoomba(roombaComm, comport, pauseTime, debug, hwhandshake);
+            smartRoomba.run();
         }
     }
 }

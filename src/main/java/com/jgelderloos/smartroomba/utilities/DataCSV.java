@@ -58,7 +58,9 @@ public class DataCSV {
 
     public  void close() {
         try {
-            fileWriter.close();
+            if (fileWriter != null) {
+                fileWriter.close();
+            }
         } catch (IOException e) {
             System.out.println("IOException while closing CSV data file");
         }
@@ -66,13 +68,15 @@ public class DataCSV {
 
     private boolean writeHeader(SensorData data) {
         boolean wasSuccess = false;
-        try {
-            fileWriter.append("TIME,");
-            fileWriter.append(data.getDataHeaderAsCSVString());
-            fileWriter.append("\n");
-            wasSuccess = true;
-        } catch (IOException e) {
-            System.out.println("IOException while writing CSV header to file");
+        if (fileWriter != null) {
+            try {
+                fileWriter.append("TIME,");
+                fileWriter.append(data.getDataHeaderAsCSVString());
+                fileWriter.append("\n");
+                wasSuccess = true;
+            } catch (IOException e) {
+                System.out.println("IOException while writing CSV header to file");
+            }
         }
         return wasSuccess;
     }

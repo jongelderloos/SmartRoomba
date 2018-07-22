@@ -9,17 +9,11 @@ public class SmartRoomba {
     private RoombaCommSerial roombaComm;
     private String comPort;
     private int pauseTime;
-    private boolean debug;
-    private boolean hwHandshake;
-    private boolean flush;
 
-    public SmartRoomba(RoombaCommSerial roombaComm, String comPort, int pauseTime, boolean debug, boolean hwHandshake, boolean flush) {
+    public SmartRoomba(RoombaCommSerial roombaComm, String comPort, int pauseTime, boolean debug, boolean hwHandshake) {
         this.roombaComm = roombaComm;
         this.comPort = comPort;
         this.pauseTime = pauseTime;
-        this.debug = debug;
-        this.hwHandshake = hwHandshake;
-        this.flush = flush;
 
         roombaComm.debug = debug;
         roombaComm.setWaitForDSR(hwHandshake);
@@ -48,6 +42,7 @@ public class SmartRoomba {
                 System.out.println("IOException while reading keyboard input");
             }
 
+            // TODO: use Stream instead of always requesting packets
             boolean rc =  roombaComm.updateSensors();
             if (!rc) {
                 System.out.println("No Roomba. :(  Is it turned on?");
@@ -57,6 +52,7 @@ public class SmartRoomba {
             boolean dataAvailable = true;
             while (dataAvailable) {
                 SensorData sensorData = roombaComm.sensorDataQueue.poll();
+                // If a valid dataCsv has been supplied then it will record
                 if (sensorData != null) {
                     roombaComm.dataCsv.writeData(sensorData);
                     System.out.println(sensorData.getRawDataAsCSVString());
