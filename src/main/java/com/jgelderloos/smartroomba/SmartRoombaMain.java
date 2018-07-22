@@ -71,10 +71,9 @@ public class SmartRoombaMain {
             } catch (IOException e) {
                 System.out.println("Error, could not open the file for writing. " + record);
             }
-            // TODO try out null object patter?
             DataCSV dataCSV = new DataCSV(fileWriter);
-            RoombaCommSerial roombaComm = new RoombaCommSerial(dataCSV);
-            SmartRoomba smartRoomba = new SmartRoomba(roombaComm, comport, pauseTime, debug, hwhandshake);
+            RoombaCommSerial roombaComm = new RoombaCommSerial();
+            SmartRoomba smartRoomba = new SmartRoomba(roombaComm, comport, pauseTime, debug, hwhandshake, dataCSV);
             smartRoomba.run();
         }
     }

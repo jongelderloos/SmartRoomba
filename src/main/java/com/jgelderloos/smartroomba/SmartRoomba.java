@@ -2,6 +2,7 @@ package com.jgelderloos.smartroomba;
 
 import com.jgelderloos.smartroomba.roomba.SensorData;
 import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
+import com.jgelderloos.smartroomba.utilities.DataCSV;
 
 import java.io.IOException;
 
@@ -9,11 +10,14 @@ public class SmartRoomba {
     private RoombaCommSerial roombaComm;
     private String comPort;
     private int pauseTime;
+    private DataCSV dataCSV;
 
-    public SmartRoomba(RoombaCommSerial roombaComm, String comPort, int pauseTime, boolean debug, boolean hwHandshake) {
+    public SmartRoomba(RoombaCommSerial roombaComm, String comPort, int pauseTime, boolean debug, boolean hwHandshake,
+           DataCSV dataCSV) {
         this.roombaComm = roombaComm;
         this.comPort = comPort;
         this.pauseTime = pauseTime;
+        this.dataCSV = dataCSV;
 
         roombaComm.debug = debug;
         roombaComm.setWaitForDSR(hwHandshake);
@@ -54,7 +58,7 @@ public class SmartRoomba {
                 SensorData sensorData = roombaComm.sensorDataQueue.poll();
                 // If a valid dataCsv has been supplied then it will record
                 if (sensorData != null) {
-                    roombaComm.dataCsv.writeData(sensorData);
+                    dataCSV.writeData(sensorData);
                     System.out.println(sensorData.getRawDataAsCSVString());
                 } else {
                     dataAvailable = false;
@@ -64,7 +68,7 @@ public class SmartRoomba {
             roombaComm.pause(pauseTime);
         }
         System.out.println("Disconnecting");
-        roombaComm.dataCsv.close();
+        dataCSV.close();
         roombaComm.disconnect();
 
         System.out.println("Done");

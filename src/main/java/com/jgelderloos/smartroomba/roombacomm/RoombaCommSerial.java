@@ -57,8 +57,6 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     static final int stopbits = SerialPort.STOPBITS_1;
     private String protocol = "SCI";
     public Queue<SensorData> sensorDataQueue;
-    public FileWriter fileWriter;
-    public DataCSV dataCsv;
 
     /**
      * contains a list of all the ports
@@ -128,32 +126,20 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
         // TODO: fix config file
         //readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
-        dataCsv = new DataCSV(null);
     }
 
-    public RoombaCommSerial(DataCSV dataCSV) {
-        super();
-        makePorts();
-        // TODO: fix config file
-        //readConfigFile();
-        sensorDataQueue = new ConcurrentLinkedQueue<>();
-        this.dataCsv = dataCSV;
-    }
-
-    public RoombaCommSerial(DataCSV dataCSV, boolean autoupdate) {
+    public RoombaCommSerial(boolean autoupdate) {
         super(autoupdate);
         makePorts();
         readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
-        this.dataCsv = dataCSV;
     }
 
-    public RoombaCommSerial(DataCSV dataCSV, boolean autoupdate, int updateTime) {
+    public RoombaCommSerial(boolean autoupdate, int updateTime) {
         super(autoupdate, updateTime);
         makePorts();
         readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
-        this.dataCsv = dataCSV;
     }
 
     void makePorts() {
