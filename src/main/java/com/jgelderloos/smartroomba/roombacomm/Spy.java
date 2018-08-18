@@ -24,9 +24,13 @@
 
 package com.jgelderloos.smartroomba.roombacomm;
 
+import com.jgelderloos.smartroomba.roomba.RoombaConstants.OpCodes;
+import com.jgelderloos.smartroomba.roomba.RoombaUtilities;
 import com.jgelderloos.smartroomba.roomba.SensorData;
 
 import java.io.*;
+
+import static com.jgelderloos.smartroomba.roomba.RoombaConstants.SensorPacketGroup.P100;
 
 /**
    Spy on the Roomba as it goes about its normal business
@@ -62,26 +66,27 @@ public class Spy {
     static boolean hwhandshake = false;
     static boolean power = false;
     static int pausetime = 500;
-    
+    static private RoombaUtilities roombaUtilities;
+
     public static void main(String[] args) {
         if( args.length == 0 ) {
             System.out.println( usage );
             System.exit(0);
         }
         String portname = args[0];  // e.g. "/dev/cu.KeySerial1"
-        RoombaCommSerial roombacomm = new RoombaCommSerial();
+        RoombaCommSerial roombaComm = new RoombaCommSerial();
 
         for( int i=1; i<args.length; i++ ) {
         	if (args[i].equals("SCI") || (args[i].equals("OI"))) {
-        		roombacomm.setProtocol(args[1]);
+        		roombaComm.setProtocol(args[1]);
         	} else if( args[i].endsWith("debug") ) 
                 debug = true;
             else if( args[i].endsWith("power") )
                 power = true;
             else if( args[i].endsWith("nohwhandshake") )
-                roombacomm.setWaitForDSR(false);
+                roombaComm.setWaitForDSR(false);
             else if( args[i].endsWith("hwhandshake") )
-                roombacomm.setWaitForDSR(true);
+                roombaComm.setWaitForDSR(true);
             else if( args[i].endsWith("pause") ) {
                 i++;
                 int p = 0;
@@ -90,20 +95,21 @@ public class Spy {
                 if( p!=0 ) pausetime = p;
             }
         }
+        roombaUtilities = new RoombaUtilities();
+
+        roombaComm.debug = debug;
         
-        roombacomm.debug = debug;
-        
-        if( ! roombacomm.connect( portname ) ) {
+        if( ! roombaComm.connect( portname ) ) {
             System.out.println("Couldn't connect to "+portname);
             System.exit(1);
         }
         
-        System.out.println("Roomba startup");
-        roombacomm.startup();
+        //System.out.println("Roomba startup");
+        //roombacomm.startup();
         
         System.out.println("Press return to exit.");
         boolean running = true;
-        while( running ) { 
+        while( running ) {
 
             try { 
                 if( System.in.available() != 0 ) {
@@ -112,34 +118,43 @@ public class Spy {
                 }
             } catch( IOException ioe ) { }
             
-            boolean rc =  roombacomm.updateSensors();
+            //boolean rc =  roombacomm.updateSensors();
+            byte[] sensorCmd = {(byte) OpCodes.SENSORS.getId(), (byte)P100.getId()};
+            roombaComm.send(sensorCmd);
+            /*
             if( !rc ) {
                 System.out.println("No Roomba. :(  Is it turned on?");
                 continue;
             }
+            */
 
             //System.out.println( System.currentTimeMillis() + ":"+ roombacomm.sensorsAsString() );
             boolean dataAvailable = true;
             while (dataAvailable) {
-                SensorData sensorData = roombacomm.sensorDataQueue.poll();
+                SensorData sensorData = roombaComm.sensorDataQueue.poll();
                 if (sensorData != null) {
-                    roombacomm.dataCsv.writeData(sensorData);
+                    //roombaComm.dataCsv.writeData(sensorData);
                     System.out.println(sensorData.getRawDataAsCSVString());
                 } else {
                     dataAvailable = false;
                 }
             }
 
-            roombacomm.pause( pausetime );
+            //roombaComm.pause( pausetime );
+            try {
+                Thread.sleep(pausetime);
+            } catch (Exception e) {
+                System.out.println("Exception sleeping while wait for DSR");
+            }
         }
         System.out.println("Disconnecting");
-        roombacomm.dataCsv.close();
-        roombacomm.disconnect();
+        //roombaComm.dataCsv.close();
+        roombaComm.disconnect();
         
         System.out.println("Done");
         
 	System.out.println("goodbye.");
-	roombacomm.disconnect();
+	roombaComm.disconnect();
     }
 }
     

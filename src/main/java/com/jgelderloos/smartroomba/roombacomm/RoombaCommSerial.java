@@ -24,7 +24,6 @@
 package com.jgelderloos.smartroomba.roombacomm;
 
 import com.jgelderloos.smartroomba.roomba.SensorData;
-import com.jgelderloos.smartroomba.utilities.DataCSV;
 import gnu.io.*;
 import java.io.*;
 import java.util.*;
@@ -55,7 +54,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     static final int databits = 8;
     static final int parity   = SerialPort.PARITY_NONE;
     static final int stopbits = SerialPort.STOPBITS_1;
-    private String protocol = "SCI";
+    private String protocol = "OI";
     public Queue<SensorData> sensorDataQueue;
 
     /**
@@ -112,6 +111,8 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
      * Let you check to see if a port is in use by another Rooomba
      * before trying to use it.
      */
+    // Dont think we need this
+    /*
     public static boolean isPortInUse( String pname ) {
         Boolean inuse = (Boolean) ports.get( pname );
         if( inuse !=null ) {
@@ -119,33 +120,29 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
         }
         return false;
     }
+    */
 
     public RoombaCommSerial() {
         super();
-        makePorts();
         // TODO: fix config file
         //readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
     }
 
+    /*
     public RoombaCommSerial(boolean autoupdate) {
         super(autoupdate);
-        makePorts();
-        readConfigFile();
+        //readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
     }
 
     public RoombaCommSerial(boolean autoupdate, int updateTime) {
         super(autoupdate, updateTime);
-        makePorts();
-        readConfigFile();
+        //readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
     }
+    */
 
-    void makePorts() {
-        if( ports == null ) 
-            ports = Collections.synchronizedMap(new TreeMap());
-    }
     /**
      * Connect to a serial port specified by portid
      * doesn't guarantee connection to Roomba, just to serial port
@@ -155,18 +152,12 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     public boolean connect(String portid) {
         logmsg("connecting to port '"+portid+"'");
         portname = portid;
-		writeConfigFile(portname, protocol, waitForDSR?'Y':'N');
 
-        if( isPortInUse( portid ) ) {
-            logmsg("port is in use");
-            return false;
-        }
+		//writeConfigFile(portname, protocol, waitForDSR?'Y':'N');
 
         connected = open_port();
 
-        if( connected ) {
-            // log in the global ports hash if the port is in use now or not
-            ports.put( portname, new Boolean( connected ) );
+        if (connected) {
             sensorsValid = false;
         }
         else {
@@ -182,24 +173,24 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     public void disconnect() {
         connected = false;
 
-        // log in the global ports hash if the port is in use now or not
-        ports.put( portname, new Boolean( connected ) );
-
         try {
             // do io streams need to be closed first?
-            if (input != null) input.close();
-            if (output != null) output.close();
-        } catch (Exception e) {
+            if (input != null) {
+                input.close();
+            }
+            if (output != null) {
+                output.close();
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
         input = null;
         output = null;
     
-        try {
-            if (port != null) port.close();  // close the port 
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (port != null) {
+            port.close();  // close the port
         }
+
         port = null;
     }
 
@@ -209,8 +200,10 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     public boolean send(byte[] bytes) {
         try {
             output.write(bytes);
-            if( flushOutput ) output.flush();   // hmm, not sure if a good idea
-        } catch (Exception e) { // null pointer or serial port dead
+            if (flushOutput) {
+                output.flush();   // hmm, not sure if a good idea
+            }
+        } catch (IOException e) { // null pointer or serial port dead
             e.printStackTrace();
         }
         return true;
@@ -219,12 +212,14 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     /**
      * This will handle both ints, bytes and chars transparently.
      */
+    // probably get rid of this so we dont have to worry about losing data in the bitwise &
     public boolean send(int b) {  // will also cover char or byte
         try {
             output.write(b & 0xff);  // for good measure do the &
-            if( flushOutput ) output.flush();   // hmm, not sure if a good idea
-        } catch (Exception e) { // null pointer or serial port dead
-            //errorMessage("send", e);
+            if (flushOutput) {
+                output.flush();   // hmm, not sure if a good idea
+            }
+        } catch (IOException e) { // null pointer or serial port dead
             e.printStackTrace();
         }
         return true;
@@ -233,9 +228,14 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     /**
      * toggles DD line via serial port DTR  (if available)
      */
+    // TODO: not sure when this is needed
     public void wakeup() {
         port.setDTR(false);
-        pause(500);
+        try {
+            Thread.sleep(500);
+        } catch (Exception e) {
+            logmsg("Exception sleeping while wait for DSR");
+        }
         port.setDTR(true);
     }
   
@@ -243,7 +243,9 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
      * Update sensors.  Block for up to 1000 ms waiting for update
      * To use non-blocking, call sensors() and then poll sensorsValid()
      */
+    // TODO: util
     public boolean updateSensors() {
+    /*
         sensorsValid = false;
         allSensors();
         for(int i=0; i < 20; i++) {
@@ -252,17 +254,24 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
                 break;
             }
             logmsg("updateSensors: pausing...");
-            pause( 50 );
+            try {
+                Thread.sleep(50);
+            } catch (Exception e) {
+                logmsg("Exception sleeping while wait for DSR");
+            }
         }
 
         return sensorsValid;
+    */
+    return false;
     }
-    
+
       
     /**
      * Update sensors.  Block for up to 1000 ms waiting for update
      * To use non-blocking, call sensors() and then poll sensorsValid()
      */
+    /*
     public boolean updateSensors(int packetcode) {
         sensorsValid = false;
         sensors(packetcode);
@@ -277,16 +286,18 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
 
         return sensorsValid;
     }
+    */
 
     /**
      * called by serialEvent when we have enough bytes to make sensors valid
      */
+    /*
     public void computeSensors() {
         sensorsValid = true;
         sensorsLastUpdateTime = System.currentTimeMillis();
         computeSafetyFault();
     }
-      
+    */
 
     /**
      * If this just hangs and never completes on Windows,
@@ -295,6 +306,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
      * FIXME: deal more gracefully
      * (from processing.serial.Serial)
      */
+    // keeping this around as a may me usefull to spit out info when connecting to a port fails
     public String[] listPorts() {
         Map ps = Collections.synchronizedMap(new LinkedHashMap());
         //Vector list = new Vector();
@@ -368,7 +380,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
 
 	public void setWaitForDSR(boolean waitForDSR) {
 		this.waitForDSR = waitForDSR;
-		writeConfigFile(portname, protocol, waitForDSR?'Y':'N');
+		//writeConfigFile(portname, protocol, waitForDSR?'Y':'N');
 	}
 
 	public String getPortname() {
@@ -378,7 +390,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
 	public void setPortname(String p) {
 		portname = p;
 		logmsg("Port: " + portname);
-		writeConfigFile(portname, protocol, waitForDSR?'Y':'N');
+		//writeConfigFile(portname, protocol, waitForDSR?'Y':'N');
 
 	}
 
@@ -401,7 +413,6 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
                     if (portId.getName().equals(portname)) {
                         logmsg("open_port:"+ portId.getName());
                         port = (SerialPort)portId.open("roomba serial", 2000);
-                        //port.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
                         input  = port.getInputStream();
                         output = port.getOutputStream();
                         port.setSerialPortParams(rate,databits,stopbits,parity);
@@ -413,7 +424,12 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
                             int i=40;
                             while( !port.isDSR() && i-- != 0) {
                                 logmsg("DSR not ready yet");
-                                pause(150); // 150*40 = 6 seconds
+                                //pause(150); // 150*40 = 6 seconds
+                                try {
+                                    Thread.sleep(150);
+                                } catch (Exception e) {
+                                    logmsg("Exception sleeping while wait for DSR");
+                                }
                             }
                             success = port.isDSR();
                         } else {
@@ -451,7 +467,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
                         // the timestamp is more accurate
                         SensorData sensorData = new SensorData(buffer, super.readRequestLength);
                         sensorDataQueue.add(sensorData);
-                        computeSensors();
+                        //computeSensors();
                     }
                 }
             }
@@ -463,6 +479,8 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     /**
      * Write a config file with current settings
      */
+    // TODO: I dont think we need a config file
+    /*
     private void writeConfigFile(String port, String protocol, char waitForDSR)
     {
     	try {
@@ -496,6 +514,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     		logmsg("unable to read .roomba_config " + e);
     	}
     }
+    */
 
     /**
      * Returns the number of bytes that have been read from serial

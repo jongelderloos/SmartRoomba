@@ -1,3 +1,6 @@
+.roomba_config
+data/
+
 *.class
 
 # Mobile Tools for Java (J2ME)

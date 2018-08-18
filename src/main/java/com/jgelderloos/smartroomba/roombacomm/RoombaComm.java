@@ -25,6 +25,9 @@ package com.jgelderloos.smartroomba.roombacomm;
 
 import com.jgelderloos.smartroomba.songs.Note;
 
+import static com.jgelderloos.smartroomba.roomba.RoombaConstants.MILLIMETERS_PER_DEGREE;
+import static com.jgelderloos.smartroomba.roomba.RoombaConstants.MILLIMETERS_PER_RADIAN;
+
 /**
  * The abstract base for all Roomba communications.
  * 
@@ -68,13 +71,6 @@ public abstract class RoombaComm {
 	/** turns on/off various debugging messages */
 	public boolean debug = false;
 
-	/** distance between wheels on the roomba, in millimeters */
-	public static final int wheelbase = 258;
-	/** mm/deg is circumference distance divided by 360 degrees */
-	public static final float millimetersPerDegree = (float) (wheelbase * Math.PI / 360.0);
-	/** mm/rad is a circumference distance divied by two pi */
-	public static final float millimetersPerRadian = (float) (wheelbase / 2);
-
 	/** default speed for movement operations if speed isn't specified */
 	public static final int defaultSpeed = 200;
 
@@ -111,6 +107,7 @@ public abstract class RoombaComm {
 		mode = MODE_UNKNOWN;
 	}
 
+	/*
 	public RoombaComm(boolean autoUpdate) {
 		this();
 		if (autoUpdate)
@@ -136,13 +133,15 @@ public abstract class RoombaComm {
 			}
 		}).start();
 	}
+	*/
 
 	/**
 	 * List available ports
-	 * 
+	 *
 	 * @return a list available portids, if applicable or empty set if no ports,
 	 *         or return null if list is not enumerable
 	 */
+	// TODO: serial helper method
 	public abstract String[] listPorts();
 
 	/**
@@ -186,6 +185,7 @@ public abstract class RoombaComm {
 	 *
 	 * @return true on successful sensor update, false otherwise
 	 */
+	// TODO: utils
 	public abstract boolean updateSensors();
 
 	/**
@@ -193,9 +193,10 @@ public abstract class RoombaComm {
 	 * requires twiddling its DD line, often hooked up to the RS-232 DTR line,
 	 * which may not be available in some implementations
 	 */
-	public void wakeup() {
-		logmsg("subclass has not implemented");
-	}
+	// TODO: serial only
+	//public void wakeup() {
+		//logmsg("subclass has not implemented");
+	//}
 
 	/**
 	 * Put Roomba in safe mode. As opposed to full mode. Safe mode is the
@@ -204,12 +205,14 @@ public abstract class RoombaComm {
 	 * picked up If that happens it goes into passive mode and must be
 	 * 'reset()'.
 	 * 
-	 * @see #reset()
 	 */
+	// TODO utils
 	public void startup() {
+	/*
 		logmsg("startup");
 		speed = defaultSpeed;
 		start();
+	*/
 	}
 
 	/**
@@ -220,77 +223,98 @@ public abstract class RoombaComm {
 	 * @see #startup()
 	 * @see #updateSensors()
 	 */
+	// TODO: utils
 	public void reset() {
+	/*
 		logmsg("reset");
 		stop();
 		startup();
 		control();
 		updateSensors();
+	*/
 	}
 
 	/** Send START command */
+    // TODO: interface
+    /*
 	public void start() {
 		logmsg("start");
 		mode = MODE_PASSIVE;
 		send(START);
 	}
+	*/
 
 	/** Send CONTROL command */
+	// TODO: interface
 	public void control() {
+	/*
 		logmsg("control");
 		mode = MODE_SAFE;
-		send(CONTROL);
+		send(SAFE);
 		// set blue dirt LED on so we know roomba is powered on & under control
 		// (and we don't forget to turn it off, and run it's batteries flat)
 		// FIXME: first time after a poweron, the lights flash then turn off
 		setLEDs(false, false, false, false, false, true, 128, 255);
+	*/
 	}
 
 	/** Send SAFE command */
+	// TODO: interface
 	public void safe() {
+	/*
 		logmsg("safe");
 		mode = MODE_SAFE;
 		send(SAFE);
+	*/
 	}
 
 	/** Send FULL command */
+	// TODO: interface
 	public void full() {
+	/*
 		logmsg("full");
 		mode = MODE_FULL;
 		send(FULL);
+	*/
 	}
 
 	/**
 	 * Power off the Roomba. Once powered off, the only way to wake it is via
 	 * wakeup() (if implemented) or via a physically pressing the Power button
 	 * 
-	 * @see #wakeup()
 	 */
+	// TODO: interface
 	public void powerOff() {
+	/*
 		logmsg("powerOff");
 		mode = MODE_UNKNOWN;
 		send(POWER);
+	*/
 	}
 
-	/** Send the SPOT command */
+	// TODO: more interfaces
 	public void spot() {
+	/*
 		logmsg("spot");
 		mode = MODE_PASSIVE;
 		send(SPOT);
+	*/
 	}
 
-	/** Send the CLEAN command */
 	public void clean() {
+	/*
 		logmsg("clean");
 		mode = MODE_PASSIVE;
 		send(CLEAN);
+	*/
 	}
 
-	/** Send the max command */
 	public void max() {
+	/*
 		logmsg("max");
 		mode = MODE_PASSIVE;
 		send(MAX);
+	*/
 	}
 
 	/**
@@ -302,6 +326,8 @@ public abstract class RoombaComm {
 	 *            SENSORS_POWER, or for roomba 5xx, it is the sensor packet
 	 *            number (from the spec)
 	 */
+	// TODO: util
+	/*
 	public void sensors(int packetcode) {
 		logmsg("sensors:" + packetcode);
 		switch (packetcode) {
@@ -375,7 +401,10 @@ public abstract class RoombaComm {
 		byte cmd[] = { (byte) SENSORS, (byte) packetcode };
 		send(cmd);
 	}
+	*/
 
+	// TODO: there is a standard java way to do this
+	/*
 	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
 	public static String bytesToHex(byte[] bytes) {
@@ -387,10 +416,13 @@ public abstract class RoombaComm {
 		}
 		return new String(hexChars);
 	}
+	*/
 
 	/**
 	 * get all sensor data
 	 */
+	// TODO: utils
+	/*
 	public void sensors() {
 		sensors(SENSORS_ALL);
 	}
@@ -398,6 +430,7 @@ public abstract class RoombaComm {
 	public void allSensors() {
 		sensors(SENSORS_ALL_REAL);
 	}
+	*/
 
 	/**
 	 * Query a list of sensors. This is a roomba 5xx only command.
@@ -408,6 +441,8 @@ public abstract class RoombaComm {
 	 *            The number of bytes of data expected to be returned from
 	 *            roomba
 	 */
+	// TODO: interface
+	/*
 	public void queryList(byte[] sensorList, int returnLen) {
 		int i = 0;
 
@@ -418,19 +453,11 @@ public abstract class RoombaComm {
 			cmd[i + 1] = sensorList[i];
 		send(cmd);
 	}
+	*/
 
 	//
 	// basic functions
 	//
-
-	/**
-	 * Alias to pause
-	 * 
-	 * @see #pause(int)
-	 */
-	public void delay(int millis) {
-		pause(millis);
-	}
 
 	/**
 	 * Just a simple pause function. Makes the thread block with Thread.sleep()
@@ -438,11 +465,14 @@ public abstract class RoombaComm {
 	 * @param millis
 	 *            number of milliseconds to wait
 	 */
+	// TODO: standard utils
 	public void pause(int millis) {
+	/*
 		try {
 			Thread.sleep(millis);
 		} catch (Exception e) {
 		}
+	*/
 	}
 
 	//
@@ -452,9 +482,12 @@ public abstract class RoombaComm {
 	/**
 	 * Stop Rooomba's motion. Sends drive(0,0)
 	 */
+	// TODO: utils
 	public void stop() {
+	/*
 		logmsg("stop");
 		drive(0, 0);
+	*/
 	}
 
 	/**
@@ -462,6 +495,8 @@ public abstract class RoombaComm {
 	 * Index 0 = package id 46 (Light Bump Left Signal)
 	 * Index 5 = package id 51 (Light Bump Right Signal)
 	 */
+	// TODO: utils
+	/*
 	public short[] getIrFront() {
 		short[] irValues = new short[6];
 		irValues[0] = toShort(sensor_bytes[0], sensor_bytes[1]);
@@ -473,15 +508,22 @@ public abstract class RoombaComm {
 
 		return irValues;
 	}
+	*/
 
 	/** Set speed for movement commands */
+	// TODO: smart roomba
 	public void setSpeed(int s) {
+	/*
 		speed = Math.abs(s);
+	*/
 	}
 
 	/** Get speed for movement commands */
 	public int getSpeed() {
+	/*
 		return speed;
+	*/
+	return 0;
 	}
 
 	/**
@@ -492,7 +534,9 @@ public abstract class RoombaComm {
 	 * @param distance
 	 *            distance in millimeters, positive or negative
 	 */
+	// TODO: util
 	public void goStraight(int distance) {
+	/*
 		float pausetime = Math.abs(distance / speed); // mm/(mm/sec) = sec
 		if (distance > 0)
 			goStraightAt(speed);
@@ -500,41 +544,55 @@ public abstract class RoombaComm {
 			goStraightAt(-speed);
 		pause((int) (pausetime * 1000));
 		stop();
+	*/
 	}
 
 	/**
 	 * @param distance
 	 *            distance in millimeters, positive
 	 */
+	// TODO: util
 	public void goForward(int distance) {
+    /*
 		if (distance < 0)
 			return;
 		goStraight(distance);
+	*/
 	}
 
 	/**
 	 * @param distance
 	 *            distance in millimeters, positive
 	 */
+	// TODO: util
 	public void goBackward(int distance) {
+    /*
 		if (distance < 0)
 			return;
 		goStraight(-distance);
+	*/
 	}
 
 	/**
 	 *
 	 */
+	// TODO: util
 	public void turnLeft() {
+    /*
 		turn(129);
+	*/
 	}
 
 	public void turnRight() {
+    /*
 		turn(-129);
+	*/
 	}
 
 	public void turn(int radius) {
+    /*
 		drive(speed, radius);
+	*/
 	}
 
 	/**
@@ -544,11 +602,14 @@ public abstract class RoombaComm {
 	 *            angle in degrees, positive to spin left, negative to spin
 	 *            right
 	 */
+	// TODO: util
 	public void spin(int angle) {
+    /*
 		if (angle > 0)
 			spinLeft(angle);
 		else if (angle < 0)
 			spinRight(-angle);
+	*/
 	}
 
 	/**
@@ -557,13 +618,16 @@ public abstract class RoombaComm {
 	 * @param angle
 	 *            angle in degrees, positive
 	 */
+	// TODO: util
 	public void spinRight(int angle) {
+    /*
 		if (angle < 0)
 			return;
-		float pausetime = Math.abs(millimetersPerDegree * angle / speed);
+		float pausetime = Math.abs(MILLIMETERS_PER_DEGREE * angle / speed);
 		spinRightAt(Math.abs(speed));
 		pause((int) (pausetime * 1000));
 		stop();
+	*/
 	}
 
 	/**
@@ -572,28 +636,37 @@ public abstract class RoombaComm {
 	 * @param angle
 	 *            angle in degrees, positive
 	 */
+	// TODO: util
 	public void spinLeft(int angle) {
+	/*
 		if (angle < 0)
 			return;
 		// float pausetime =
-		float pausetime = Math.abs(millimetersPerDegree * angle / speed);
+		float pausetime = Math.abs(MILLIMETERS_PER_DEGREE * angle / speed);
 		spinLeftAt(Math.abs(speed));
 		pause((int) (pausetime * 1000));
 		stop();
+	*/
 	}
 
 	/**
 	 * Spin in place anti-clockwise, at the current speed
 	 */
+	// TODO: util
 	public void spinLeft() {
+    /*
 		spinLeftAt(speed);
+	*/
 	}
 
 	/**
 	 * Spin in place clockwise, at the current speed
 	 */
+	// TODO: util
 	public void spinRight() {
+    /*
 		spinRightAt(speed);
+	*/
 	}
 
 	/**
@@ -602,8 +675,11 @@ public abstract class RoombaComm {
 	 * @param aspeed
 	 *            speed to spin at
 	 */
+	// TODO: util
 	public void spinLeftAt(int aspeed) {
+    /*
 		drive(aspeed, 1);
+	*/
 	}
 
 	/**
@@ -612,8 +688,11 @@ public abstract class RoombaComm {
 	 * @param aspeed
 	 *            speed to spin at, positive
 	 */
+	// TODO: util
 	public void spinRightAt(int aspeed) {
+    /*
 		drive(aspeed, -1);
+	*/
 	}
 
 	//
@@ -627,45 +706,60 @@ public abstract class RoombaComm {
 	 * @param velocity
 	 *            velocity of motion in mm/sec
 	 */
+	// TODO: uitl
 	public void goStraightAt(int velocity) {
+    /*
 		// System.out.println("goStraightAt: velocity:"+velocity);
 		if (velocity > 500)
 			velocity = 500;
 		if (velocity < -500)
 			velocity = -500;
 		drive(velocity, 0x8000);
+	*/
 	}
 
 	/**
 	 * Go forward the current (positive) speed
 	 */
+	// TODO: util
 	public void goForward() {
+    /*
 		goStraightAt(Math.abs(speed));
+	*/
 	}
 
 	/**
 	 * Go backward at the current (negative) speed
 	 */
+	// TODO: util
 	public void goBackward() {
+    /*
 		goStraightAt(-Math.abs(speed));
+	*/
 	}
 
 	/**
 	 * Go forward at a specified speed
 	 */
+	// TODO: util
 	public void goForwardAt(int aspeed) {
+    /*
 		if (aspeed < 0)
 			return;
 		goStraightAt(aspeed);
+	*/
 	}
 
 	/**
 	 * Go backward at a specified speed
 	 */
+	// TODO: util
 	public void goBackwardAt(int aspeed) {
+    /*
 		if (aspeed < 0)
 			return;
 		goStraightAt(-aspeed);
+	*/
 	}
 
 	//
@@ -683,11 +777,14 @@ public abstract class RoombaComm {
 	 * @param radius
 	 *            radius of turn in millimeters
 	 */
+	// TODO :util
 	public void drive(int velocity, int radius) {
+    /*
 		byte cmd[] = { (byte) DRIVE, (byte) (velocity >>> 8), (byte) (velocity & 0xff), (byte) (radius >>> 8),
 				(byte) (radius & 0xff) };
 		logmsg("drive: " + hex(cmd[0]) + "," + hex(cmd[1]) + "," + hex(cmd[2]) + "," + hex(cmd[3]) + "," + hex(cmd[4]));
 		send(cmd);
+	*/
 	}
 
 	/**
@@ -700,17 +797,23 @@ public abstract class RoombaComm {
 	 * @param duration
 	 *            duration of note in 1/64ths of a second
 	 */
+	// TODO: util
 	public void playNote(int note, int duration) {
+    /*
 		logmsg("playnote: " + note + ":" + duration);
 		byte cmd[] = { (byte) SONG, 3, 1, (byte) note, (byte) duration, // define
 																		// song
 				(byte) PLAY, 3 }; // play it back
 		send(cmd);
+	*/
 	}
 
+	// TODO: util
 	public void playSong(int songnum) {
+    /*
 		byte cmd[] = { (byte) PLAY, (byte) songnum };
 		send(cmd);
+	*/
 	}
 
 	/**
@@ -722,7 +825,9 @@ public abstract class RoombaComm {
 	 *            array of songnotes, even entries are notenums, odd are
 	 *            duration of 1/6ths
 	 */
+	// TODO: uti;
 	public void createSong(int songnum, int song[]) {
+    /*
 		int len = song.length;
 		int songlen = len / 2;
 		logmsg("createSong: songnum:" + songnum + ", songlen:" + songlen);
@@ -734,6 +839,7 @@ public abstract class RoombaComm {
 			cmd[3 + i] = (byte) song[i];
 		}
 		send(cmd);
+	*/
 	}
 
 	/**
@@ -744,6 +850,8 @@ public abstract class RoombaComm {
 	 * @param song
 	 *            array of Notes
 	 */
+	// TODO: util
+    /*
 	public void createSong(int songnum, Note song[]) {
 		int songlen = song.length;
 		logmsg("createSong: songnum:" + songnum + ", songlen:" + songlen);
@@ -758,6 +866,7 @@ public abstract class RoombaComm {
 		}
 		send(cmd);
 	}
+    */
 
 	/**
 	 * Turns on/off the non-drive motors (main brush, vacuum, sidebrush). Sort
@@ -770,22 +879,28 @@ public abstract class RoombaComm {
 	 * @param sidebrush
 	 *            sidebrush motor on/off state
 	 */
+	// TODO: util
+    /*
 	public void setMotors(boolean mainbrush, boolean vacuum, boolean sidebrush) {
 		byte cmd[] = { (byte) MOTORS, (byte) ((mainbrush ? 0x04 : 0) | (vacuum ? 0x02 : 0) | (sidebrush ? 0x01 : 0)) };
 		send(cmd);
 	}
+	*/
 
 	/**
 	 * Turns on/off the various LEDs. Low-level command. FIXME: this is too
 	 * complex
 	 */
+	// TODO: util
 	public void setLEDs(boolean status_green, boolean status_red, boolean spot, boolean clean, boolean max,
 			boolean dirt, int power_color, int power_intensity) {
+    /*
 		int v = (status_green ? 0x20 : 0) | (status_red ? 0x10 : 0) | (spot ? 0x08 : 0) | (clean ? 0x04 : 0)
 				| (max ? 0x02 : 0) | (dirt ? 0x01 : 0);
 		logmsg("setLEDS: " + binary(v));
 		byte cmd[] = { (byte) LEDS, (byte) v, (byte) power_color, (byte) power_intensity };
 		send(cmd);
+	*/
 	}
 
 	/**
@@ -794,9 +909,12 @@ public abstract class RoombaComm {
 	 * @param state
 	 *            true to turn on vacuum function, false to turn it off
 	 */
+	// TODO: util
 	public void vacuum(boolean state) {
+    /*
 		logmsg("vacuum: " + state);
 		setMotors(state, state, state);
+	*/
 	}
 
 	//
@@ -812,6 +930,8 @@ public abstract class RoombaComm {
 	 *         safe mode
 	 * @see #updateSensors()
 	 */
+	// TODO: util
+    /*
 	public boolean computeSafetyFault() {
 		safetyFault = (sensor_bytes[BUMPSWHEELDROPS] & WHEELDROP_MASK) != 0 || sensor_bytes[CLIFFLEFT] == 1
 				|| sensor_bytes[CLIFFFRONTLEFT] == 1 || sensor_bytes[CLIFFRIGHT] == 1
@@ -822,6 +942,7 @@ public abstract class RoombaComm {
 
 		return safetyFault;
 	}
+	*/
 
 	/**
 	 * Returns current connected state. It's up to subclasses to ensure this
@@ -829,16 +950,23 @@ public abstract class RoombaComm {
 	 * 
 	 * @return current connected state
 	 */
+	// TODO: smart roomba
+    /*
 	public boolean connected() {
 		return connected;
 	}
+	*/
 
 	/** current ROI mode RoombaComm thinks the Roomba is in */
+	// TODO: smart roomba
+    /*
 	public int mode() {
 		return mode;
 	}
+	*/
 
 	/** mode as String */
+	/*
 	public String modeAsString() {
 		String s = null;
 		switch (mode) {
@@ -857,30 +985,25 @@ public abstract class RoombaComm {
 		}
 		return s;
 	}
+	*/
 
 	/** */
 	public boolean sensorsAutoUpdate() {
 		return sensorsAutoUpdate;
 	}
 
-	/** */
 	public void setSensorsAutoUpdate(boolean b) {
 		sensorsAutoUpdate = b;
 	}
 
-	/** */
 	public int sensorsUpdateTime() {
 		return sensorsUpdateTime;
 	}
 
-	/** */
 	public void setSensorsUpdateTime(int i) {
 		sensorsUpdateTime = i;
 	}
 
-	/**
-	 *
-	 */
 	public boolean safetyFault() {
 		return safetyFault;
 	}
@@ -888,6 +1011,8 @@ public abstract class RoombaComm {
 	/**
 	 * 
 	 */
+	// TODO: util
+    /*
 	public boolean sensorsValid() {
 		// FIXME:
 		if (sensorsValid) { // may be valid but stale
@@ -899,11 +1024,14 @@ public abstract class RoombaComm {
 		}
 		return false;
 	}
+	*/
 
 	/**
 	 * @return some sensor data as a string
 	 */
+	// TODO: shouldnt need this with the new sensor data class
 	public String sensorsAsString() {
+    /*
 		String sd = "";
 		if (debug) {
 			sd = "\n";
@@ -919,11 +1047,12 @@ public abstract class RoombaComm {
 				+ " butt:" + hex(buttons()) + " dist:" + distance() + " angl:" + angle() + " chst:" + charging_state()
 				+ " volt:" + voltage() + " curr:" + current() + " temp:" + temperature() + " chrg:" + charge()
 				+ " capa:" + capacity() + sd;
+				*/
+    	return "";
 	}
 
-	// TODO: there are missing sensor values from the above method. They need to be added to this version
-	// TODO: return a structure that can be exported to a csv or something for recording
 	public String allSensorsAsString() {
+    /*
 		String sd = "";
 		if (debug) {
 			sd = "\n";
@@ -939,262 +1068,207 @@ public abstract class RoombaComm {
 				+ " butt:" + hex(buttons()) + " dist:" + distance() + " angl:" + angle() + " chst:" + charging_state()
 				+ " volt:" + voltage() + " curr:" + current() + " temp:" + temperature() + " chrg:" + charge()
 				+ " capa:" + capacity() + sd;
+	*/
+    return "";
 	}
 
-	/** Did we bump into anything */
+    // TODO: sensors?
+    /*
 	public boolean bump() {
 		return (sensor_bytes[BUMPSWHEELDROPS] & BUMP_MASK) != 0;
 	}
 
-	/** Left bump sensor */
+	*/
 	public boolean bumpLeft() {
-		return (sensor_bytes[BUMPSWHEELDROPS] & BUMPLEFT_MASK) != 0;
+		//return (sensor_bytes[BUMPSWHEELDROPS] & BUMPLEFT_MASK) != 0;
+		return false;
 	}
 
-	/** Right bump sensor */
 	public boolean bumpRight() {
-		return (sensor_bytes[BUMPSWHEELDROPS] & BUMPRIGHT_MASK) != 0;
+		//return (sensor_bytes[BUMPSWHEELDROPS] & BUMPRIGHT_MASK) != 0;
+        return false;
 	}
 
-	/** Left wheeldrop sensor */
+    /*
 	public boolean wheelDropLeft() {
 		return (sensor_bytes[BUMPSWHEELDROPS] & WHEELDROPLEFT_MASK) != 0;
 	}
 
-	/** Right wheeldrop sensor */
 	public boolean wheelDropRight() {
 		return (sensor_bytes[BUMPSWHEELDROPS] & WHEELDROPRIGHT_MASK) != 0;
 	}
 
-	/** Center wheeldrop sensor */
 	public boolean wheelDropCenter() {
 		return (sensor_bytes[BUMPSWHEELDROPS] & WHEELDROPCENT_MASK) != 0;
 	}
 
-	/** Can we see a wall? */
+	*/
 	public boolean wall() {
-		return sensor_bytes[WALL] != 0;
+		//return sensor_bytes[WALL] != 0;
+        return false;
 	}
 
 	/**
 	 * @return true if dirt present
 	 */
+	// TODO: sensor
+    /*
 	public boolean dirt() {
 		int dl = sensor_bytes[DIRTLEFT] & 0xff;
 		int dr = sensor_bytes[DIRTRIGHT] & 0xff;
 		// if(debug) println("Roomba:dirt: dl,dr="+dl+","+dr);
 		return (dl > 100) || (dr > 100);
 	}
+	*/
 
-	/**
-	 * amount of dirt seen by left dirt sensor
-	 */
+    // TODO: sensor
+    /*
 	public int dirtLeft() {
 		return dirt_left(); // yeah yeah
 	}
 
-	/**
-	 * amount of dirt seen by right dirt sensor
-	 */
 	public int dirtRight() {
 		return dirt_right();
 	}
 
-	/** left cliff sensor */
 	public boolean cliffLeft() {
 		return (sensor_bytes[CLIFFLEFT] != 0);
 	}
 
-	/** front left cliff sensor */
 	public boolean cliffFrontLeft() {
 		return (sensor_bytes[CLIFFFRONTLEFT] != 0);
 	}
 
-	/** front right cliff sensor */
 	public boolean cliffFrontRight() {
 		return (sensor_bytes[CLIFFFRONTRIGHT] != 0);
 	}
 
-	/** right cliff sensor */
 	public boolean cliffRight() {
 		return sensor_bytes[CLIFFRIGHT] != 0;
 	}
 
-	/** overcurrent on left drive wheel */
 	public boolean motorOvercurrentDriveLeft() {
 		return (sensor_bytes[MOTOROVERCURRENTS] & MOVERDRIVELEFT_MASK) != 0;
 	}
 
-	/** overcurrent on right drive wheel */
 	public boolean motorOvercurrentDriveRight() {
 		return (sensor_bytes[MOTOROVERCURRENTS] & MOVERDRIVERIGHT_MASK) != 0;
 	}
 
-	/** overcurrent on main brush */
 	public boolean motorOvercurrentMainBrush() {
 		return (sensor_bytes[MOTOROVERCURRENTS] & MOVERMAINBRUSH_MASK) != 0;
 	}
 
-	/** overcurrent on vacuum */
 	public boolean motorOvercurrentVacuum() {
 		return (sensor_bytes[MOTOROVERCURRENTS] & MOVERVACUUM_MASK) != 0;
 	}
 
-	/** overcurrent on side brush */
 	public boolean motorOvercurrentSideBrush() {
 		return (sensor_bytes[MOTOROVERCURRENTS] & MOVERSIDEBRUSH_MASK) != 0;
 	}
 
-	/** 'Power' button pressed state */
 	public boolean powerButton() {
 		return (sensor_bytes[BUTTONS] & POWERBUTTON_MASK) != 0;
 	}
 
-	/** 'Spot' button pressed state */
 	public boolean spotButton() {
 		return (sensor_bytes[BUTTONS] & SPOTBUTTON_MASK) != 0;
 	}
 
-	/** 'Clean' button pressed state */
 	public boolean cleanButton() {
 		return (sensor_bytes[BUTTONS] & CLEANBUTTON_MASK) != 0;
 	}
 
-	/** 'Max' button pressed state */
 	public boolean maxButton() {
 		return (sensor_bytes[BUTTONS] & MAXBUTTON_MASK) != 0;
 	}
 
-	//
-	// lower-level sensor access
-	//
-	/** lower-level func, returns raw byte */
 	public int bumps_wheeldrops() {
 		return sensor_bytes[BUMPSWHEELDROPS];
 	}
 
-	/** lower-level func, returns raw byte */
 	public int cliff_left() {
 		return sensor_bytes[CLIFFLEFT];
 	}
 
-	/** lower-level func, returns raw byte */
 	public int cliff_frontleft() {
 		return sensor_bytes[CLIFFFRONTLEFT];
 	}
 
-	/** lower-level func, returns raw byte */
 	public int cliff_frontright() {
 		return sensor_bytes[CLIFFFRONTRIGHT];
 	}
 
-	/** lower-level func, returns raw byte */
 	public int cliff_right() {
 		return sensor_bytes[CLIFFRIGHT];
 	}
 
-	/** lower-level func, returns raw byte */
 	public int virtual_wall() {
 		return sensor_bytes[VIRTUALWALL];
 	}
 
-	/** lower-level func, returns raw byte */
 	public int motor_overcurrents() {
 		return sensor_bytes[MOTOROVERCURRENTS];
 	}
 
-	/**  */
 	public int dirt_left() {
 		return sensor_bytes[DIRTLEFT] & 0xff;
 	}
 
-	/** */
 	public int dirt_right() {
 		return sensor_bytes[DIRTRIGHT] & 0xff;
 	}
 
-	/** lower-level func, returns raw byte */
 	public int remote_opcode() {
 		return sensor_bytes[REMOTEOPCODE];
 	}
 
-	/** lower-level func, returns raw byte */
 	public int buttons() {
 		return sensor_bytes[BUTTONS];
 	}
 
-	/**
-	 * Distance traveled since last requested units: mm range: -32768 - 32767
-	 */
 	public short distance() {
 		return toShort(sensor_bytes[DISTANCE_HI], sensor_bytes[DISTANCE_LO]);
 	}
 
-	/**
-	 * Angle traveled since last requested units: mm, diff in distance traveled
-	 * by two drive wheels range: -32768 - 32767
-	 */
 	public short angle() {
 		return toShort(sensor_bytes[ANGLE_HI], sensor_bytes[ANGLE_LO]);
 	}
 
-	/**
-	 * angle since last read, but in degrees
-	 */
 	// FIXME I think this should be (360 * angle())/(258 * PI)
 	public float angleInDegrees() {
-		return (float) angle() / millimetersPerDegree;
+		return (float) angle() / MILLIMETERS_PER_DEGREE;
 	}
 
-	/**
-	 * angle since last read, but in radians
-	 */
 	// FIXME I think this should be (2 * angle())/258
 	public float angleInRadians() {
-		return (float) angle() / millimetersPerRadian;
+		return (float) angle() / MILLIMETERS_PER_RADIAN;
 	}
 
-	/**
-	 * Charging state units: enumeration range:
-	 */
 	public int charging_state() {
 		return sensor_bytes[CHARGINGSTATE] & 0xff;
 	}
 
-	/**
-	 * Voltage of battery units: mV range: 0 - 65535
-	 */
 	public int voltage() {
 		return toUnsignedShort(sensor_bytes[VOLTAGE_HI], sensor_bytes[VOLTAGE_LO]);
 	}
 
-	/**
-	 * Current flowing in or out of battery units: mA range: -332768 - 32767
-	 */
 	public short current() {
 		return toShort(sensor_bytes[CURRENT_HI], sensor_bytes[CURRENT_LO]);
 	}
 
-	/**
-	 * temperature of battery units: degrees Celcius range: -128 - 127
-	 */
 	public byte temperature() {
 		return sensor_bytes[TEMPERATURE];
 	}
 
-	/**
-	 * Current charge of battery units: mAh range: 0-65535
-	 */
 	public int charge() {
 		return toUnsignedShort(sensor_bytes[CHARGE_HI], sensor_bytes[CHARGE_LO]);
 	}
 
-	/**
-	 * Estimated charge capacity of battery units: mAh range: 0-65535
-	 */
 	public int capacity() {
 		return toUnsignedShort(sensor_bytes[CAPACITY_HI], sensor_bytes[CAPACITY_LO]);
 	}
+	*/
 
 	// possible modes
 	public static final int MODE_UNKNOWN = 0;
@@ -1206,7 +1280,6 @@ public abstract class RoombaComm {
 	// these should all be bytes, but Java bytes are signed, sucka
 	public static final int START = 128; // 0
 	public static final int BAUD = 129; // 1
-	public static final int CONTROL = 130; // 0
 	public static final int SAFE = 131; // 0
 	public static final int FULL = 132; // 0
 	public static final int POWER = 133; // 0
@@ -1312,13 +1385,12 @@ public abstract class RoombaComm {
 	/**
 	 *
 	 */
+	// TODO: common util
+    /*
 	static public final short toShort(byte hi, byte lo) {
 		return (short) ((hi << 8) | (lo & 0xff));
 	}
 
-	/**
-	 *
-	 */
 	static public final int toUnsignedShort(byte hi, byte lo) {
 		return (int) (hi & 0xff) << 8 | lo & 0xff;
 	}
@@ -1338,10 +1410,12 @@ public abstract class RoombaComm {
 	public String binary(int i) {
 		return Integer.toBinaryString(i);
 	}
+	*/
 
 	/**
 	 * just a little debug
 	 */
+	// TODO: log4j
 	public void logmsg(String msg) {
 		if (debug)
 			System.err.println("RoombaComm (" + System.currentTimeMillis() + "):" + msg);

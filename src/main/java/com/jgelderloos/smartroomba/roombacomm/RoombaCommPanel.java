@@ -128,7 +128,7 @@ public class RoombaCommPanel extends JPanel implements ActionListener,ChangeList
      */
     public void playMidiNote( int notenum, int velocity ) {
         updateDisplay("play note: "+notenum+","+velocity+"\n");
-        if( !roombacomm.connected() ) return;
+        //if( !roombacomm.connected() ) return;
         
         if( notenum >= 31 ) {                // G and above
             if( velocity == 0 ) return;
@@ -175,10 +175,12 @@ public class RoombaCommPanel extends JPanel implements ActionListener,ChangeList
         }
 
         // stop right here if we're not connected
+        /*
         if( !roombacomm.connected() ) {
             updateDisplay("not connected!\n");
             return;
         }
+        */
 
         if( "stop".equals(action) ) {
             roombacomm.stop();

@@ -264,10 +264,12 @@ public class RoombaRecorderPanel extends JPanel implements ActionListener,Runnab
             } catch(NumberFormatException e) { }
         }
         // stop right here if we're not connected
+        /*
         if(!roombacomm.connected()) {
             updateDisplay("not connected!\n");
             return;
         }
+        */
 
         //updateDisplay(action+"\n");
         if("stop".equals(action)) {

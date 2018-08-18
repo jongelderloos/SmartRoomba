@@ -67,7 +67,9 @@ public class SmartRoombaMain {
 
             FileWriter fileWriter = null;
             try {
-                fileWriter = new FileWriter(record);
+                if (record != null) {
+                    fileWriter = new FileWriter(record);
+                }
             } catch (IOException e) {
                 System.out.println("Error, could not open the file for writing. " + record);
             }
