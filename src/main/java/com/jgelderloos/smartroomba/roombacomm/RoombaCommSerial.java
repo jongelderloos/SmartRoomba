@@ -456,6 +456,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
         try {
             logmsg("serialEvent:"+serialEvent+", available:"+input.available());
             if (serialEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+                logmsg("data available");
                 // input.available does not always add up to the total bytes being read, sometime more data becomes available
                 // during the while loop
                 while (input.available() > 0) {

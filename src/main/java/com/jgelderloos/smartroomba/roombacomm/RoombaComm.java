@@ -317,6 +317,10 @@ public abstract class RoombaComm {
 	*/
 	}
 
+	public void setReadRequestLength(int readRequestLength) {
+	    this.readRequestLength = readRequestLength;
+    }
+
 	/**
 	 * Send the SENSORS command with one of the SENSORS_ arguments Typically,
 	 * one does "sensors(SENSORS_ALL)" to get all sensor data

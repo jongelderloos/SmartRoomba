@@ -59,6 +59,7 @@ public class SmartRoomba {
             // TODO: use Stream instead of always requesting packets
             //boolean rc =  roombaComm.updateSensors();
             byte[] sensorCmd = {(byte)OpCodes.SENSORS.getId(), (byte)P100.getId()};
+            roombaComm.setReadRequestLength(roombaUtilities.getSensorPacketSize(P100));
             roombaComm.send(sensorCmd);
 
             // TODO: print a message like this if we are not receiving any sensor data
