@@ -25,7 +25,29 @@ package com.jgelderloos.smartroomba.roomba;
 import java.time.LocalDateTime;
 
 public class SensorData {
-    public static final int MAX_SENSOR_BYTES = 93; // 93 bytes returned when requesting all packets
+    private static final int MAX_SENSOR_BYTES = 93; // 93 bytes returned when requesting all packets
+
+	private static final int BUMPER_RIGHT_MASK = 0x01;
+	private static final int BUMPER_LEFT_MASK = 0x02;
+    private static final int WHEEL_DROP_RIGHT_MASK = 0x04;
+    private static final int WHEEL_DROP_LEFT_MASK = 0x08;
+	private static final int CLIFF_MASK = 0x01;
+    private static final int VIRTUAL_WALL_MASK = 0x01;
+    private static final int OVER_CURRENT_LEFT_WHEEL_MASK = 0x10;
+    private static final int OVER_CURRENT_RIGHT_WHEEL_MASK = 0x08;
+    private static final int OVER_CURRENT_MAIN_BRUSH_MASK = 0x04;
+    private static final int OVER_CURRENT_SIDE_BRUSH_MASK = 0x01;
+
+    private static final int DOCK_BUTTON_MASK = 0x04;
+	private static final int SPOT_BUTTON_MASK = 0x02;
+	private static final int CLEAN_BUTTON_MASK = 0x01;
+
+    private static final int LIGHT_BUMPER_RIGHT_MASK = 0x20;
+    private static final int LIGHT_BUMPER_FRONT_RIGHT_MASK = 0x10;
+    private static final int LIGHT_BUMPER_CENTER_RIGHT_MASK = 0x08;
+    private static final int LIGHT_BUMPER_CENTER_LEFT_MASK = 0x04;
+    private static final int LIGHT_BUMPER_FRONT_LEFT_MASK = 0x02;
+    private static final int LIGHT_BUMPER_LEFT_MASK = 0x01;
 
     // Sensor packet indicies
     public enum PacketOffsets {
@@ -36,7 +58,7 @@ public class SensorData {
         CLIFF_FRONT_RIGHT,
         CLIFF_RIGHT,
         VIRTUAL_WALL,
-        WHEEL_OVERCURRENTS,
+        WHEEL_OVER_CURRENTS,
         DIRT_DETECT,
         UNUSED_1,
         INFRARED_CHARACTER_OMNI,
@@ -133,10 +155,6 @@ public class SensorData {
         System.arraycopy(data, 0, sensorData, 0, dataLength);
     }
 
-    public byte[] getRawSensorData() {
-        return sensorData;
-    }
-
     public String getRawDataAsCSVString() {
         StringBuilder stringBuilder = new StringBuilder();
         int i = 0;
@@ -165,4 +183,145 @@ public class SensorData {
         }
         return stringBuilder.toString();
     }
+
+    private byte getBumpsAndWheelDrops() {
+        return sensorData[PacketOffsets.BUMPS_WHEEL_DROPS.ordinal()];
+    }
+
+    public boolean isBumpLeft() {
+        return (getBumpsAndWheelDrops() & BUMPER_LEFT_MASK) != 0;
+    }
+
+    public boolean isBumpRight() {
+        return (getBumpsAndWheelDrops() & BUMPER_RIGHT_MASK) != 0;
+    }
+
+    public boolean isWheelDropLeft() {
+        return (getBumpsAndWheelDrops() & WHEEL_DROP_LEFT_MASK) != 0;
+    }
+
+    public boolean isWheelDropRight() {
+        return (getBumpsAndWheelDrops() & WHEEL_DROP_RIGHT_MASK) != 0;
+    }
+
+    private byte getCliffLeft() {
+        return sensorData[PacketOffsets.CLIFF_LEFT.ordinal()];
+    }
+
+    public boolean isCliffLeft() {
+        return (getCliffLeft() & CLIFF_MASK) != 0;
+    }
+
+    private byte getCliffFrontLeft() {
+        return sensorData[PacketOffsets.CLIFF_FRONT_LEFT.ordinal()];
+    }
+
+    public boolean isCliffFrontLeft() {
+        return (getCliffFrontLeft() & CLIFF_MASK) != 0;
+    }
+
+    private byte getCliffFrontRight() {
+        return sensorData[PacketOffsets.CLIFF_FRONT_RIGHT.ordinal()];
+    }
+
+    public boolean isCliffFrontRight() {
+        return (getCliffFrontRight() & CLIFF_MASK) != 0;
+    }
+
+    private byte getCliffRight() {
+        return sensorData[PacketOffsets.CLIFF_RIGHT.ordinal()];
+    }
+
+    public boolean isCliffRight() {
+        return (getCliffRight() & CLIFF_MASK) != 0;
+    }
+
+    private byte getVirtualWall() {
+        return sensorData[PacketOffsets.VIRTUAL_WALL.ordinal()];
+    }
+
+    public boolean isVirtualWall() {
+        return (getVirtualWall() & VIRTUAL_WALL_MASK) != 0;
+    }
+
+    private byte getWheelOverCurrents() {
+        return sensorData[PacketOffsets.WHEEL_OVER_CURRENTS.ordinal()];
+    }
+
+    public boolean isOverCurrentLeftWheel() {
+        return (getWheelOverCurrents() & OVER_CURRENT_LEFT_WHEEL_MASK) != 0;
+    }
+
+    public boolean isOverCurrentRightWheel() {
+        return (getWheelOverCurrents() & OVER_CURRENT_RIGHT_WHEEL_MASK) != 0;
+    }
+
+    public boolean isOverCurrentMainBrush() {
+        return (getWheelOverCurrents() & OVER_CURRENT_MAIN_BRUSH_MASK) != 0;
+    }
+
+    public boolean isOverCurrentSideBrush() {
+        return (getWheelOverCurrents() & OVER_CURRENT_SIDE_BRUSH_MASK) != 0;
+    }
+
+    private byte getButtons() {
+        return (sensorData[PacketOffsets.BUTTONS.ordinal()]);
+    }
+
+    public boolean isCleanButton() {
+        return (getButtons() & CLEAN_BUTTON_MASK) != 0;
+    }
+
+    public boolean isSpotButton() {
+        return (getButtons() & SPOT_BUTTON_MASK) != 0;
+    }
+
+    public boolean isDockButton() {
+        return (getButtons() & DOCK_BUTTON_MASK) != 0;
+    }
+
+    public short getDistance() {
+        return (short) ((sensorData[PacketOffsets.DISTANCE_HI.ordinal()] << 8) | sensorData[PacketOffsets.DISTANCE_LO.ordinal()]);
+    }
+
+    public short getAngle() {
+        return (short) ((sensorData[PacketOffsets.ANGLE_HI.ordinal()] << 8) | sensorData[PacketOffsets.ANGLE_LO.ordinal()]);
+    }
+
+    public short getLeftEncoderCount() {
+        return (short) ((sensorData[PacketOffsets.LEFT_ENCODER_COUNTS_HI.ordinal()] << 8) | sensorData[PacketOffsets.LEFT_ENCODER_COUNTS_LO.ordinal()]);
+    }
+
+    public short getRightEncoderCount() {
+        return (short) ((sensorData[PacketOffsets.RIGHT_ENCODER_COUNTS_HI.ordinal()] << 8) | sensorData[PacketOffsets.RIGHT_ENCODER_COUNTS_LO.ordinal()]);
+    }
+
+    private byte getLightBumper() {
+        return sensorData[PacketOffsets.LIGHT_BUMPER.ordinal()];
+    }
+
+    public boolean isLightBumperRight() {
+        return (getLightBumper() & LIGHT_BUMPER_RIGHT_MASK) != 0;
+    }
+
+    public boolean isLightBumperFrontRight() {
+        return (getLightBumper() & LIGHT_BUMPER_FRONT_RIGHT_MASK) != 0;
+    }
+
+    public boolean isLightBumperCenterRight() {
+        return (getLightBumper() & LIGHT_BUMPER_CENTER_RIGHT_MASK) != 0;
+    }
+
+    public boolean isLightBumperCenterLeft() {
+        return (getLightBumper() & LIGHT_BUMPER_CENTER_LEFT_MASK) != 0;
+    }
+
+    public boolean isLightBumperFrontLeft() {
+        return (getLightBumper() & LIGHT_BUMPER_FRONT_LEFT_MASK) != 0;
+    }
+
+    public boolean isLightBumperLeft() {
+        return (getLightBumper() & LIGHT_BUMPER_LEFT_MASK) != 0;
+    }
+
 }

@@ -25,11 +25,15 @@ package com.jgelderloos.smartroomba.roomba;
 
 public class RoombaConstants {
     /** distance between wheels on the roomba, in millimeters */
-    public static final int WHEELBASE = 258;
+    public static final double WHEELBASE = 258f;
     /** mm/deg is circumference distance divided by 360 degrees */
-    public static final float MILLIMETERS_PER_DEGREE = (float) (WHEELBASE * Math.PI / 360.0);
+    public static final double MILLIMETERS_PER_DEGREE = WHEELBASE * Math.PI / 360f;
     /** mm/rad is a circumference distance divied by two pi */
-    public static final float MILLIMETERS_PER_RADIAN = (float) (WHEELBASE / 2);
+    public static final double MILLIMETERS_PER_RADIAN = WHEELBASE / 2f;
+    public static final double PI = 3.14159f;
+    public static final double MILLIMETERS_PER_WHEEL_TURN = 72f;
+    public static final double ENCODER_COUNTS_PER_WHEEL_TURN = 508.8f;
+
 
     public enum SensorPacketGroup {
         P0(0),

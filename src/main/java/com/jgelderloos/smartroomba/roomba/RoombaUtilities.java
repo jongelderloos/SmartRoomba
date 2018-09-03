@@ -51,4 +51,29 @@ public class RoombaUtilities {
     public int getSensorPacketSize(SensorPacketGroup packet) {
         return sensorPackSizeMap.get(packet);
     }
+
+    public double getMilimetersFromEncoderCounts(int encoderCounts) {
+        return encoderCounts * (RoombaConstants.PI * RoombaConstants.MILLIMETERS_PER_WHEEL_TURN / RoombaConstants.ENCODER_COUNTS_PER_WHEEL_TURN);
+    }
+
+    // For now this is calculated on a forward clockwise turn
+    public double getAngleFromWheelDistances(double leftWheelDistance, double rightWheelDistance) {
+        return ((360f * leftWheelDistance) - (360f * rightWheelDistance)) / (2f * RoombaConstants.PI * RoombaConstants.WHEELBASE);
+    }
+
+    public double getRadius(double angle, double distance) {
+        return (360f * distance) / (angle * 2f * RoombaConstants.PI);
+    }
+
+    public double getDistance(double angle, double radius) {
+        return (2f * RoombaConstants.PI * angle * radius) / 360;
+    }
+
+    public double getHeight(double angle, double radius) {
+        return radius * Math.sin(angle);
+    }
+
+    public double getLength(double angle, double radius) {
+        return radius * Math.cos(angle);
+    }
 }

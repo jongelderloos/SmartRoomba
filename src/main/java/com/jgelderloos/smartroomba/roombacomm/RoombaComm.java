@@ -1084,12 +1084,12 @@ public abstract class RoombaComm {
 
 	*/
 	public boolean bumpLeft() {
-		//return (sensor_bytes[BUMPSWHEELDROPS] & BUMPLEFT_MASK) != 0;
+		//return (sensor_bytes[BUMPSWHEELDROPS] & BUMPER_LEFT_MASK) != 0;
 		return false;
 	}
 
 	public boolean bumpRight() {
-		//return (sensor_bytes[BUMPSWHEELDROPS] & BUMPRIGHT_MASK) != 0;
+		//return (sensor_bytes[BUMPSWHEELDROPS] & BUMPER_RIGHT_MASK) != 0;
         return false;
 	}
 
@@ -1339,24 +1339,6 @@ public abstract class RoombaComm {
 	public static final int CAPACITY_LO = 25;
 
 	// bitmasks for various thingems
-	public static final int WHEELDROP_MASK = 0x1C;
-	public static final int BUMP_MASK = 0x03;
-	public static final int BUMPRIGHT_MASK = 0x01;
-	public static final int BUMPLEFT_MASK = 0x02;
-	public static final int WHEELDROPRIGHT_MASK = 0x04;
-	public static final int WHEELDROPLEFT_MASK = 0x08;
-	public static final int WHEELDROPCENT_MASK = 0x10;
-
-	public static final int MOVERDRIVELEFT_MASK = 0x10;
-	public static final int MOVERDRIVERIGHT_MASK = 0x08;
-	public static final int MOVERMAINBRUSH_MASK = 0x04;
-	public static final int MOVERVACUUM_MASK = 0x02;
-	public static final int MOVERSIDEBRUSH_MASK = 0x01;
-
-	public static final int POWERBUTTON_MASK = 0x08;
-	public static final int SPOTBUTTON_MASK = 0x04;
-	public static final int CLEANBUTTON_MASK = 0x02;
-	public static final int MAXBUTTON_MASK = 0x01;
 
 	// which sensor packet, argument for sensors(int)
 	public static final int SENSORS_ALL = 0;

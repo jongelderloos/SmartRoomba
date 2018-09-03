@@ -18,6 +18,7 @@ public class SmartRoomba {
     private int pauseTime;
     private DataCSV dataCSV;
     private RoombaUtilities roombaUtilities;
+    private RoombaMapData roombaMapData;
 
     public SmartRoomba(RoombaCommSerial roombaComm, String comPort, int pauseTime, boolean debug, boolean hwHandshake,
            DataCSV dataCSV) {
@@ -26,6 +27,7 @@ public class SmartRoomba {
         this.pauseTime = pauseTime;
         this.dataCSV = dataCSV;
         roombaUtilities = new RoombaUtilities();
+        roombaMapData = new RoombaMapData();
 
         roombaComm.debug = debug;
         roombaComm.setWaitForDSR(hwHandshake);
@@ -76,6 +78,7 @@ public class SmartRoomba {
                 // If a valid dataCsv has been supplied then it will record
                 if (sensorData != null) {
                     lastSensorUpdate = LocalDateTime.now();
+                    processData(sensorData);
                     dataCSV.writeData(sensorData);
                     System.out.println(sensorData.getRawDataAsCSVString());
                 } else {
@@ -106,4 +109,17 @@ public class SmartRoomba {
         System.out.println("Done");
     }
 
+    private void processData(SensorData sensorData) {
+        if (!isSafeToContinue(sensorData)) {
+            roombaComm.send(OpCodes.START.getId());
+        } else {
+            roombaMapData.processSensorData(sensorData);
+        }
+    }
+
+    private boolean isSafeToContinue(SensorData sensorData) {
+        return sensorData.isCliffLeft() || sensorData.isCliffRight() || sensorData.isCliffFrontLeft() || sensorData.isCliffFrontRight() ||
+                sensorData.isWheelDropLeft() || sensorData.isWheelDropRight() || sensorData.isOverCurrentLeftWheel() ||
+                sensorData.isOverCurrentRightWheel() || sensorData.isOverCurrentMainBrush() || sensorData.isOverCurrentSideBrush();
+    }
 }
