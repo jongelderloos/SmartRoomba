@@ -4,9 +4,12 @@ import com.jgelderloos.smartroomba.roomba.RoombaConstants;
 import com.jgelderloos.smartroomba.roomba.RoombaUtilities;
 import com.jgelderloos.smartroomba.roomba.SensorData;
 
+import java.awt.geom.Point2D;
+
 public class RoombaMapData {
-    private double xPosition = 0;
-    private double yPosition = 0;
+    private Point2D.Double position = new Point2D.Double(0, 0);
+    //private double xPosition = 0;
+    //private double yPosition = 0;
     private int lastLeftEncoderCount = 0;
     private int lastRightEncoderCount = 0;
     private boolean processedFirstSensorData = false;
@@ -47,21 +50,28 @@ public class RoombaMapData {
                 double centerRadius = innerRadius + (RoombaConstants.WHEELBASE / 2);
                 double centerDistance = roombaUtilities.getDistance(angle, centerRadius);
 
-                double xCenter = xPosition - centerDistance;
-                double yCenter = yPosition;
+                Point2D.Double centerPosition = new Point2D.Double(position.getX() - centerDistance, position.getY());
+                //double xCenter = position.getX() - centerDistance;
+                //double yCenter = position.getY();
 
-                double xFromCenter = roombaUtilities.getLength(calculatedAngle, centerRadius);
-                double yFromCenter = roombaUtilities.getHeight(calculatedAngle, centerRadius);
+                Point2D.Double fromCenterDistance = new Point2D.Double(
+                        roombaUtilities.getLength(calculatedAngle, centerRadius),
+                        roombaUtilities.getHeight(calculatedAngle, centerRadius));
+                //double xFromCenter = roombaUtilities.getLength(calculatedAngle, centerRadius);
+                //double yFromCenter = roombaUtilities.getHeight(calculatedAngle, centerRadius);
 
-                double currentXPosition = xCenter + xFromCenter;
-                double currentYPositoin = yCenter + yFromCenter;
+                //double currentXPosition = xCenter + xFromCenter;
+                //double currentYPosition = yCenter + yFromCenter;
 
-                xPosition = currentXPosition;
-                yPosition = currentYPositoin;
-
+                //position.setLocation(currentXPosition, currentYPosition);
+                position.setLocation(centerPosition.getX() + fromCenterDistance.getX(),
+                        centerPosition.getY() + fromCenterDistance.getY());
             } else {
-                yPosition += changeInLeftDistance;
+                //yPosition += changeInLeftDistance;
+                position.setLocation(position.getX(), position.getY() + changeInLeftDistance);
             }
+
+            System.out.println("Position updated to: " + position.toString());
         }
     }
 }
