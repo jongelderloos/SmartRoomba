@@ -155,6 +155,16 @@ public class SensorData {
         System.arraycopy(data, 0, sensorData, 0, dataLength);
     }
 
+    public SensorData(byte[] data, int dataLength, LocalDateTime dateTimeToSet) {
+        if (dateTimeToSet == null) {
+            dateTime = LocalDateTime.now();
+        } else {
+            dateTime = dateTimeToSet;
+        }
+        sensorData = new byte[MAX_SENSOR_BYTES];
+        System.arraycopy(data, 0, sensorData, 0, dataLength);
+    }
+
     public String getRawDataAsCSVString() {
         StringBuilder stringBuilder = new StringBuilder();
         int i = 0;

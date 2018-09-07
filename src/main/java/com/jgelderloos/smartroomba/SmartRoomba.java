@@ -74,7 +74,7 @@ public class SmartRoomba {
 
             boolean dataAvailable = true;
             while (dataAvailable) {
-                SensorData sensorData = roombaComm.sensorDataQueue.poll();
+                SensorData sensorData = roombaComm.getSensorDataQueue().poll();
                 // If a valid dataCsv has been supplied then it will record
                 if (sensorData != null) {
                     lastSensorUpdate = LocalDateTime.now();

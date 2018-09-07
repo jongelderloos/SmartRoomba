@@ -55,7 +55,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
     static final int parity   = SerialPort.PARITY_NONE;
     static final int stopbits = SerialPort.STOPBITS_1;
     private String protocol = "OI";
-    public Queue<SensorData> sensorDataQueue;
+    private Queue<SensorData> sensorDataQueue;
 
     /**
      * contains a list of all the ports
@@ -142,6 +142,9 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
         sensorDataQueue = new ConcurrentLinkedQueue<>();
     }
     */
+    public Queue<SensorData> getSensorDataQueue() {
+        return sensorDataQueue;
+    }
 
     /**
      * Connect to a serial port specified by portid
