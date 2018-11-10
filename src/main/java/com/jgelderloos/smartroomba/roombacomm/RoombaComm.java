@@ -23,7 +23,10 @@
 
 package com.jgelderloos.smartroomba.roombacomm;
 
+import com.jgelderloos.smartroomba.roomba.SensorData;
 import com.jgelderloos.smartroomba.songs.Note;
+
+import java.util.Queue;
 
 import static com.jgelderloos.smartroomba.roomba.RoombaConstants.MILLIMETERS_PER_DEGREE;
 import static com.jgelderloos.smartroomba.roomba.RoombaConstants.MILLIMETERS_PER_RADIAN;
@@ -188,6 +191,7 @@ public abstract class RoombaComm {
 	// TODO: utils
 	public abstract boolean updateSensors();
 
+	public abstract Queue<SensorData> getSensorDataQueue();
 	/**
 	 * Wake's Roomba up, if possible, thus optional To wake up the Roomba
 	 * requires twiddling its DD line, often hooked up to the RS-232 DTR line,

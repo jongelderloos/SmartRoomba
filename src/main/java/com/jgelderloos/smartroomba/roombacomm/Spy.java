@@ -131,7 +131,7 @@ public class Spy {
             //System.out.println( System.currentTimeMillis() + ":"+ roombacomm.sensorsAsString() );
             boolean dataAvailable = true;
             while (dataAvailable) {
-                SensorData sensorData = roombaComm.sensorDataQueue.poll();
+                SensorData sensorData = roombaComm.getSensorDataQueue().poll();
                 if (sensorData != null) {
                     //roombaComm.dataCsv.writeData(sensorData);
                     System.out.println(sensorData.getRawDataAsCSVString());

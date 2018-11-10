@@ -25,9 +25,12 @@
 
 package com.jgelderloos.smartroomba.net;
 
+import com.jgelderloos.smartroomba.roomba.SensorData;
 import com.jgelderloos.smartroomba.roombacomm.*;
 import java.net.*;
 import java.io.*;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class RoombaCommTCPClient extends RoombaComm implements Runnable
 {
@@ -47,7 +50,12 @@ public class RoombaCommTCPClient extends RoombaComm implements Runnable
     public RoombaCommTCPClient() {
         super();
     }
-    
+
+    // TODO: fill this out if this class should actually extend roomba comm, I dont think it should
+    public Queue<SensorData> getSensorDataQueue() {
+        return new ConcurrentLinkedQueue<>();
+    }
+
     // gotta finish this....
     public boolean connect(String portid) {
         String s[] = portid.split(":");

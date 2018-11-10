@@ -3,6 +3,7 @@ package com.jgelderloos.smartroomba;
 import com.jgelderloos.smartroomba.roomba.RoombaConstants.OpCodes;
 import com.jgelderloos.smartroomba.roomba.RoombaUtilities;
 import com.jgelderloos.smartroomba.roomba.SensorData;
+import com.jgelderloos.smartroomba.roombacomm.RoombaComm;
 import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
 import com.jgelderloos.smartroomba.utilities.DataCSV;
 
@@ -13,14 +14,14 @@ import java.time.LocalDateTime;
 import static com.jgelderloos.smartroomba.roomba.RoombaConstants.SensorPacketGroup.P100;
 
 public class SmartRoomba {
-    private RoombaCommSerial roombaComm;
+    private RoombaComm roombaComm;
     private String comPort;
     private int pauseTime;
     private DataCSV dataCSV;
     private RoombaUtilities roombaUtilities;
     private RoombaMapData roombaMapData;
 
-    public SmartRoomba(RoombaCommSerial roombaComm, String comPort, int pauseTime, boolean debug, boolean hwHandshake,
+    public SmartRoomba(RoombaComm roombaComm, String comPort, int pauseTime, boolean debug, boolean hwHandshake,
            DataCSV dataCSV) {
         this.roombaComm = roombaComm;
         this.comPort = comPort;
@@ -30,8 +31,13 @@ public class SmartRoomba {
         roombaMapData = new RoombaMapData();
 
         roombaComm.debug = debug;
-        roombaComm.setWaitForDSR(hwHandshake);
-        roombaComm.setProtocol("OI");
+
+        if (roombaComm instanceof RoombaCommSerial) {
+            RoombaCommSerial serial = (RoombaCommSerial) roombaComm;
+            serial.setWaitForDSR(hwHandshake);
+            // TODO: should this be for all RoombaComms?
+            serial.setProtocol("OI");
+        }
 
     }
 

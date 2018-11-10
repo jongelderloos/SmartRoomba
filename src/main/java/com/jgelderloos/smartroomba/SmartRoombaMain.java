@@ -1,5 +1,7 @@
 package com.jgelderloos.smartroomba;
 
+import com.jgelderloos.smartroomba.roombacomm.RoombaComm;
+import com.jgelderloos.smartroomba.roombacomm.RoombaCommPlaybackMode;
 import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
 import com.jgelderloos.smartroomba.utilities.DataCSV;
 import org.apache.commons.cli.CommandLine;
@@ -74,7 +76,13 @@ public class SmartRoombaMain {
                 System.out.println("Error, could not open the file for writing. " + record);
             }
             DataCSV dataCSV = new DataCSV(fileWriter);
-            RoombaCommSerial roombaComm = new RoombaCommSerial();
+            RoombaComm roombaComm;
+            try {
+                Integer.parseInt(comport);
+                roombaComm = new RoombaCommSerial();
+            } catch (NumberFormatException ex) {
+                roombaComm = new RoombaCommPlaybackMode();
+            }
             SmartRoomba smartRoomba = new SmartRoomba(roombaComm, comport, pauseTime, debug, hwhandshake, dataCSV);
             smartRoomba.run();
         }

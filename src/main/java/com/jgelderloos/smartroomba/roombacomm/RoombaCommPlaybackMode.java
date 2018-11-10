@@ -60,7 +60,7 @@ public class RoombaCommPlaybackMode extends RoombaComm {
                             String dateTimeString = splitLine[0];
                             dateTime = LocalDateTime.parse(dateTimeString);
                         } else {
-                            byte currentByte = Byte.valueOf(dataByte);
+                            byte currentByte = (byte)(int) Integer.decode(dataByte);
                             byteArray[dataByteNumber] = currentByte;
                             dataByteNumber++;
                         }
@@ -81,12 +81,10 @@ public class RoombaCommPlaybackMode extends RoombaComm {
     }
 
     public boolean send(byte[] bytes) {
-        System.out.println("Not sending data in playback mode.");
         return true;
     }
 
     public boolean send(int b) {
-        System.out.println("Not sending data in playback mode.");
         return true;
     }
 
