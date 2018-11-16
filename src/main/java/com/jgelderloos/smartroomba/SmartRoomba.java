@@ -70,13 +70,7 @@ public class SmartRoomba {
             roombaComm.setReadRequestLength(roombaUtilities.getSensorPacketSize(P100));
             roombaComm.send(sensorCmd);
 
-            // TODO: print a message like this if we are not receiving any sensor data
-            /*
-            if (!rc) {
-                System.out.println("No Roomba. :(  Is it turned on?");
-                continue;
-            }
-            */
+            // TODO: do we need an end packet for the recorded sensor data so we stop the replay?
 
             boolean dataAvailable = true;
             while (dataAvailable) {

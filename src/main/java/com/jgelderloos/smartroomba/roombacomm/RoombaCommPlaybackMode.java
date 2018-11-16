@@ -2,6 +2,7 @@ package com.jgelderloos.smartroomba.roombacomm;
 
 import com.jgelderloos.smartroomba.roomba.SensorData;
 import com.jgelderloos.smartroomba.utilities.DataCSVReader;
+import com.jgelderloos.smartroomba.utilities.ReplaySensorDataThread;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -15,12 +16,14 @@ public class RoombaCommPlaybackMode extends RoombaComm {
     private Queue<SensorData> sensorDataQueue;
     private Queue<SensorData> fileDataQueue;
     private DataCSVReader dataCSVReader;
+    private ReplaySensorDataThread replaySensorDataThread;
 
     public RoombaCommPlaybackMode() {
         super();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
         fileDataQueue = new ConcurrentLinkedQueue<>();
         dataCSVReader = new DataCSVReader();
+        replaySensorDataThread = new ReplaySensorDataThread(sensorDataQueue, fileDataQueue);
     }
 
     public String[] listPorts() {
@@ -33,47 +36,48 @@ public class RoombaCommPlaybackMode extends RoombaComm {
         return sensorDataQueue;
     }
 
-    public boolean connect(String portid) {
-        FileReader fileReader = null;
+    public boolean connect(String portId) {
         BufferedReader bufferedReader = null;
         try {
-            fileReader = new FileReader(portid);
+            FileReader fileReader = new FileReader(portId);
             bufferedReader = new BufferedReader(fileReader);
-            dataCSVReader = new DataCSVReader(bufferedReader);
-            List<String> fileData = dataCSVReader.readData();
-            //fileDataQueue.addAll(fileData);
-            boolean isFirstLine = true;
-            for (String currentLine : fileData) {
-                // Skip the file header on the first line
-                if (isFirstLine) {
-                    isFirstLine = false;
-                } else {
-                    LocalDateTime dateTime = null;
-                    String[] splitLine = currentLine.split(",");
-                    byte[] byteArray = new byte[splitLine.length - 1];
-                    boolean isFirstByte = true;
-                    int dataByteNumber = 0;
-                    for (String dataByte : splitLine) {
-                        if (isFirstByte) {
-                            isFirstByte = false;
-
-                            String dateTimeString = splitLine[0];
-                            dateTime = LocalDateTime.parse(dateTimeString);
-                        } else {
-                            byte currentByte = (byte)(int) Integer.decode(dataByte);
-                            byteArray[dataByteNumber] = currentByte;
-                            dataByteNumber++;
-                        }
-
-                    }
-                    SensorData sensorData = new SensorData(byteArray, splitLine.length - 1, dateTime);
-                    fileDataQueue.add(sensorData);
-                }
-            }
-            // TODO: run thread to move file data to sensor data
         } catch (FileNotFoundException ex) {
-            System.out.println("FileNotFoundException. Could not find file: " + portid);
+            System.out.println("FileNotFoundException. Could not find file: " + portId);
         }
+
+        dataCSVReader = new DataCSVReader(bufferedReader);
+        List<String> fileData = dataCSVReader.readData();
+        boolean isFirstLine = true;
+        for (String currentLine : fileData) {
+            // Skip the file header on the first line
+            if (isFirstLine) {
+                isFirstLine = false;
+            } else {
+                LocalDateTime dateTime = null;
+                String[] splitLine = currentLine.split(",");
+                byte[] byteArray = new byte[splitLine.length - 1];
+                boolean isFirstByte = true;
+                int dataByteNumber = 0;
+                for (String dataByte : splitLine) {
+                    if (isFirstByte) {
+                        isFirstByte = false;
+
+                        String dateTimeString = splitLine[0];
+                        dateTime = LocalDateTime.parse(dateTimeString);
+                    } else {
+                        byte currentByte = (byte)(int) Integer.decode(dataByte);
+                        byteArray[dataByteNumber] = currentByte;
+                        dataByteNumber++;
+                    }
+
+                }
+                SensorData sensorData = new SensorData(byteArray, splitLine.length - 1, dateTime);
+                fileDataQueue.add(sensorData);
+            }
+        }
+
+        // TODO: run this in the background
+        replaySensorDataThread.run();
         return true;
     }
 
