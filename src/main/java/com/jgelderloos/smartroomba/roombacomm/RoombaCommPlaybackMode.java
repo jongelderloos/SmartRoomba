@@ -76,8 +76,8 @@ public class RoombaCommPlaybackMode extends RoombaComm {
             }
         }
 
-        // TODO: run this in the background
-        replaySensorDataThread.run();
+        Thread replayThread = new Thread(replaySensorDataThread);
+        replayThread.start();
         return true;
     }
 
