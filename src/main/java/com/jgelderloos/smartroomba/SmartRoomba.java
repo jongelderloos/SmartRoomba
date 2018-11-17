@@ -52,6 +52,7 @@ public class SmartRoomba {
         roombaComm.send(OpCodes.START.getId());
 
         System.out.println("Press return to exit.");
+        int dataCount = 1;
         LocalDateTime lastSensorUpdate = LocalDateTime.now();
         boolean running = true;
         while (running) {
@@ -80,7 +81,9 @@ public class SmartRoomba {
                     lastSensorUpdate = LocalDateTime.now();
                     processData(sensorData);
                     dataCSV.writeData(sensorData);
+                    System.out.println("Sensor Data: " + dataCount + " " + lastSensorUpdate.toString());
                     System.out.println(sensorData.getRawDataAsCSVString());
+                    dataCount++;
                 } else {
                     dataAvailable = false;
                 }
@@ -112,14 +115,15 @@ public class SmartRoomba {
     private void processData(SensorData sensorData) {
         if (!isSafeToContinue(sensorData)) {
             roombaComm.send(OpCodes.START.getId());
+            System.out.println("Unsafe condition detected by sensors. Stopping Roomba");
         } else {
             roombaMapData.processSensorData(sensorData);
         }
     }
 
     private boolean isSafeToContinue(SensorData sensorData) {
-        return sensorData.isCliffLeft() || sensorData.isCliffRight() || sensorData.isCliffFrontLeft() || sensorData.isCliffFrontRight() ||
-                sensorData.isWheelDropLeft() || sensorData.isWheelDropRight() || sensorData.isOverCurrentLeftWheel() ||
-                sensorData.isOverCurrentRightWheel() || sensorData.isOverCurrentMainBrush() || sensorData.isOverCurrentSideBrush();
+        return !sensorData.isCliffLeft() && !sensorData.isCliffRight() && !sensorData.isCliffFrontLeft() && !sensorData.isCliffFrontRight() &&
+                !sensorData.isWheelDropLeft() && !sensorData.isWheelDropRight() && !sensorData.isOverCurrentLeftWheel() &&
+                !sensorData.isOverCurrentRightWheel() && !sensorData.isOverCurrentMainBrush() && !sensorData.isOverCurrentSideBrush();
     }
 }

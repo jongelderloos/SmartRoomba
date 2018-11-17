@@ -27,7 +27,9 @@ public class RoombaMapData {
             lastRightEncoderCount = currentRightEncoderCount;
         } else {
             int changeInLeftEncoderCounts = currentLeftEncoderCount - lastLeftEncoderCount;
+            lastLeftEncoderCount = currentLeftEncoderCount;
             int changeInRightEncoderCounts = currentRightEncoderCount - lastRightEncoderCount;
+            lastRightEncoderCount = currentRightEncoderCount;
             double changeInLeftDistance = roombaUtilities.getMilimetersFromEncoderCounts(changeInLeftEncoderCounts);
             double changeInRightDistance = roombaUtilities.getMilimetersFromEncoderCounts(changeInRightEncoderCounts);
 
@@ -48,9 +50,10 @@ public class RoombaMapData {
                 double innerRadius = roombaUtilities.getRadius(calculatedAngle, changeInRightDistance);
 
                 double centerRadius = innerRadius + (RoombaConstants.WHEELBASE / 2);
-                double centerDistance = roombaUtilities.getDistance(angle, centerRadius);
+                double changeInCenterDistance = roombaUtilities.getDistance(calculatedAngle, centerRadius);
 
-                Point2D.Double centerPosition = new Point2D.Double(position.getX() - centerDistance, position.getY());
+                // TODO: I think this is where I am going wrong. X should be current - the center radius, Y should be roughly current - changeInCenterDistance
+                Point2D.Double centerPosition = new Point2D.Double(position.getX() - changeInCenterDistance, position.getY());
                 //double xCenter = position.getX() - centerDistance;
                 //double yCenter = position.getY();
 
