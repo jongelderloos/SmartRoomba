@@ -298,12 +298,12 @@ public class SensorData {
         return (short) ((sensorData[PacketOffsets.ANGLE_HI.ordinal()] << 8) | sensorData[PacketOffsets.ANGLE_LO.ordinal()]);
     }
 
-    public short getLeftEncoderCount() {
-        return (short) ((sensorData[PacketOffsets.LEFT_ENCODER_COUNTS_HI.ordinal()] << 8) | sensorData[PacketOffsets.LEFT_ENCODER_COUNTS_LO.ordinal()]);
+    public int getLeftEncoderCount() {
+        return (((sensorData[PacketOffsets.LEFT_ENCODER_COUNTS_HI.ordinal()] & 0xFF) << 8) | (sensorData[PacketOffsets.LEFT_ENCODER_COUNTS_LO.ordinal()] & 0xff));
     }
 
-    public short getRightEncoderCount() {
-        return (short) ((sensorData[PacketOffsets.RIGHT_ENCODER_COUNTS_HI.ordinal()] << 8) | sensorData[PacketOffsets.RIGHT_ENCODER_COUNTS_LO.ordinal()]);
+    public int getRightEncoderCount() {
+        return (((sensorData[PacketOffsets.RIGHT_ENCODER_COUNTS_HI.ordinal()] & 0xFF) << 8) | (sensorData[PacketOffsets.RIGHT_ENCODER_COUNTS_LO.ordinal()] & 0xFF));
     }
 
     private byte getLightBumper() {

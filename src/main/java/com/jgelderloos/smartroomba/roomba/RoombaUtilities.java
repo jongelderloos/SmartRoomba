@@ -57,16 +57,29 @@ public class RoombaUtilities {
     }
 
     // For now this is calculated on a forward clockwise turn
-    public double getAngleFromWheelDistances(double leftWheelDistance, double rightWheelDistance) {
-        return ((360f * leftWheelDistance) - (360f * rightWheelDistance)) / (2f * RoombaConstants.PI * RoombaConstants.WHEELBASE);
+    public double getRadiansFromWheelDistance(double leftWheelDistance, double rightWheelDistance) {
+        return (leftWheelDistance - rightWheelDistance) / RoombaConstants.WHEELBASE;
     }
 
-    public double getRadius(double angle, double distance) {
-        return (360f * distance) / (angle * 2f * RoombaConstants.PI);
+    public double getRadius(double radians, double arcDistance) {
+        return arcDistance / radians;
     }
 
-    public double getDistance(double angle, double radius) {
-        return (2f * RoombaConstants.PI * angle * radius) / 360;
+    public double getArcDistance(double radians, double radius) {
+        return radius * radians;
+    }
+
+    public double getStraightDistance(double angle, double radius) {
+        return Math.sqrt((2 * Math.pow(radius, 2)) - (2 * Math.pow(radius, 2) * Math.cos(angle)));
+    }
+
+    // TODO: all the Math methods use radians not degrees
+    public double getNearSideLength(double angle, double hypotenuse) {
+        return hypotenuse * Math.cos(angle);
+    }
+
+    public double getFarSideLength(double angle, double hypotenuse) {
+        return hypotenuse * Math.sin(angle);
     }
 
     public double getHeight(double angle, double radius) {
