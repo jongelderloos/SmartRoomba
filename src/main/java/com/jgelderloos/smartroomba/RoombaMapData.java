@@ -45,27 +45,35 @@ public class RoombaMapData {
                         changeInRadians + ", sensor angle: " + sensorAngle);
             }
 
+            double changeInStraightDistance = changeInLeftDistance;
             if (changeInRadians != 0) {
-                double innerRadius= roombaUtilities.getRadius(changeInRadians, changeInRightDistance);
 
+                // The smaller distance is the inside of the the turn
+                double innerDistance;
+                // TODO: handle negative distances
+                if (changeInLeftDistance > changeInRightDistance) {
+                    innerDistance = changeInRightDistance;
+                } else {
+                    innerDistance = changeInLeftDistance;
+                }
+
+                double innerRadius = roombaUtilities.getRadius(Math.abs(changeInRadians), innerDistance);
                 double centerRadius = innerRadius + (RoombaConstants.WHEELBASE / 2);
 
                 // TODO: this will be used in the total distance traveled
-                double changeInCenterDistance = roombaUtilities.getArcDistance(changeInRadians, centerRadius);
+                double changeInCenterDistance = roombaUtilities.getArcDistance(Math.abs(changeInRadians), centerRadius);
 
-                double changeInStraightDistance = roombaUtilities.getStraightDistance(changeInRadians, centerRadius);
+                changeInStraightDistance = roombaUtilities.getStraightDistance(Math.abs(changeInRadians), centerRadius);
 
-                // TODO: near side being X or Y may depend on the current angle of roomba
-                double changeInX = roombaUtilities.getFarSideLength(changeInRadians, changeInStraightDistance);
-                double changeInY = roombaUtilities.getNearSideLength(changeInRadians, changeInStraightDistance);
-
-                position.setLocation(position.getX() + changeInX, position.getY() + changeInY);
                 radians += changeInRadians;
-            } else {
-                // TODO: cant just add to Y, need to use the current angle and add to X and Y based off that
-                //yPosition += changeInLeftDistance;
-                position.setLocation(position.getX(), position.getY() + changeInLeftDistance);
             }
+
+            // TODO: near side being X or Y may depend on the current angle of roomba, i think the current wat will always be correct...
+            // TODO: also need to think about negative radians being passed in here, i think it is ok as is...
+            double changeInX = roombaUtilities.getFarSideLength(radians, changeInStraightDistance);
+            double changeInY = roombaUtilities.getNearSideLength(radians, changeInStraightDistance);
+
+            position.setLocation(position.getX() + changeInX, position.getY() + changeInY);
 
             System.out.println("Position updated to: " + position.toString() + ", radians: " + radians + ", degrees: " + Math.toDegrees(radians));
         }

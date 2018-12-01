@@ -79,10 +79,10 @@ public class SmartRoomba {
                 // If a valid dataCsv has been supplied then it will record
                 if (sensorData != null) {
                     lastSensorUpdate = LocalDateTime.now();
-                    processData(sensorData);
-                    dataCSV.writeData(sensorData);
                     System.out.println("Sensor Data: " + dataCount + " " + lastSensorUpdate.toString());
                     System.out.println(sensorData.getRawDataAsCSVString());
+                    processData(sensorData);
+                    dataCSV.writeData(sensorData);
                     dataCount++;
                 } else {
                     dataAvailable = false;
