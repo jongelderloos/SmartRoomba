@@ -25,7 +25,7 @@ package com.jgelderloos.smartroomba.roomba;
 import java.time.LocalDateTime;
 
 public class SensorData {
-    private static final int MAX_SENSOR_BYTES = 93; // 93 bytes returned when requesting all packets
+    public static final int MAX_SENSOR_BYTES = 93; // 93 bytes returned when requesting all packets
 
 	private static final int BUMPER_RIGHT_MASK = 0x01;
 	private static final int BUMPER_LEFT_MASK = 0x02;

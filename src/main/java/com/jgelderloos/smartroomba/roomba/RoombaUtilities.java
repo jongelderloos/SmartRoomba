@@ -24,6 +24,8 @@
 package com.jgelderloos.smartroomba.roomba;
 
 import com.jgelderloos.smartroomba.roomba.RoombaConstants.SensorPacketGroup;
+
+import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,12 +55,16 @@ public class RoombaUtilities {
     }
 
     public double getMilimetersFromEncoderCounts(int encoderCounts) {
-        return encoderCounts * (RoombaConstants.PI * RoombaConstants.MILLIMETERS_PER_WHEEL_TURN / RoombaConstants.ENCODER_COUNTS_PER_WHEEL_TURN);
+        return encoderCounts * (Math.PI * RoombaConstants.MILLIMETERS_PER_WHEEL_TURN / RoombaConstants.ENCODER_COUNTS_PER_WHEEL_TURN);
     }
 
     // For now this is calculated on a forward clockwise turn
     public double getRadiansFromWheelDistance(double leftWheelDistance, double rightWheelDistance) {
-        return (leftWheelDistance - rightWheelDistance) / RoombaConstants.WHEELBASE;
+        return (rightWheelDistance - leftWheelDistance) / RoombaConstants.WHEELBASE;
+    }
+
+    public double getTurnRadians(double arcRadians, double straightDistance, double radius) {
+        return Math.PI - arcRadians - (Math.asin(radius * (Math.sin(arcRadians) / straightDistance)));
     }
 
     public double getRadius(double radians, double arcDistance) {
@@ -69,8 +75,8 @@ public class RoombaUtilities {
         return radius * radians;
     }
 
-    public double getStraightDistance(double angle, double radius) {
-        return Math.sqrt((2 * Math.pow(radius, 2)) - (2 * Math.pow(radius, 2) * Math.cos(angle)));
+    public double getStraightDistance(double radians, double radius) {
+        return Math.sqrt((2 * Math.pow(radius, 2)) - (2 * Math.pow(radius, 2) * Math.cos(radians)));
     }
 
     // TODO: all the Math methods use radians not degrees
@@ -82,11 +88,19 @@ public class RoombaUtilities {
         return hypotenuse * Math.sin(angle);
     }
 
-    public double getHeight(double angle, double radius) {
-        return radius * Math.sin(angle);
+    public Point2D.Double getPointOnCircle(double radians, double radius, boolean isRightTurn) {
+        double radiansToUse = radians;
+        if (isRightTurn) {
+            radiansToUse += Math.PI;
+        }
+        return new Point2D.Double(getLength(radiansToUse, radius), getHeight(radiansToUse, radius));
     }
 
-    public double getLength(double angle, double radius) {
-        return radius * Math.cos(angle);
+    public double getHeight(double radians, double radius) {
+        return radius * Math.sin(radians);
+    }
+
+    public double getLength(double radians, double radius) {
+        return radius * Math.cos(radians);
     }
 }

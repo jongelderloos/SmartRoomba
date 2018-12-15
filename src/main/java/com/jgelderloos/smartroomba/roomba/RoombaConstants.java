@@ -30,7 +30,6 @@ public class RoombaConstants {
     public static final double MILLIMETERS_PER_DEGREE = WHEELBASE * Math.PI / 360f;
     /** mm/rad is a circumference distance divied by two pi */
     public static final double MILLIMETERS_PER_RADIAN = WHEELBASE / 2f;
-    public static final double PI = 3.14159f;
     public static final double MILLIMETERS_PER_WHEEL_TURN = 72f;
     public static final double ENCODER_COUNTS_PER_WHEEL_TURN = 508.8f;
 

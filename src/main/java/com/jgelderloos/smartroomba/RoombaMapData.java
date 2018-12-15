@@ -1,3 +1,25 @@
+/*
+ *  SmartRoomba - RoombaMapData
+ *
+ *  Copyright (c) 2018 Jon Gelderloos
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General
+ *  Public License along with this library; if not, write to the
+ *  Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ *  Boston, MA  02111-1307  USA
+ *
+ */
+
 package com.jgelderloos.smartroomba;
 
 import com.jgelderloos.smartroomba.roomba.RoombaConstants;
@@ -49,33 +71,62 @@ public class RoombaMapData {
             if (changeInRadians != 0) {
 
                 // The smaller distance is the inside of the the turn
-                double innerDistance;
+                double outerDistance;
                 // TODO: handle negative distances
                 if (changeInLeftDistance > changeInRightDistance) {
-                    innerDistance = changeInRightDistance;
+                    if (changeInLeftDistance > 0 && changeInRightDistance > 0) {
+                        outerDistance = changeInLeftDistance;
+                    } else {
+                        outerDistance = changeInRightDistance;
+                    }
                 } else {
-                    innerDistance = changeInLeftDistance;
+                    if (changeInLeftDistance > 0 && changeInRightDistance > 0) {
+                        outerDistance = changeInRightDistance;
+                    } else {
+                        outerDistance = changeInLeftDistance;
+                    }
                 }
 
-                double innerRadius = roombaUtilities.getRadius(Math.abs(changeInRadians), innerDistance);
-                double centerRadius = innerRadius + (RoombaConstants.WHEELBASE / 2);
+                double outerRadius = roombaUtilities.getRadius(Math.abs(changeInRadians), Math.abs(outerDistance));
+                double centerRadius = outerRadius - (RoombaConstants.WHEELBASE / 2);
 
                 // TODO: this will be used in the total distance traveled
                 double changeInCenterDistance = roombaUtilities.getArcDistance(Math.abs(changeInRadians), centerRadius);
 
                 changeInStraightDistance = roombaUtilities.getStraightDistance(Math.abs(changeInRadians), centerRadius);
 
+                // TODO: not sure this is needed for anything
+                double turnRadians = roombaUtilities.getTurnRadians(changeInRadians, changeInStraightDistance, centerRadius);
+
+                // Get the point on the turn circle prior to the turn (radians)
+                Point2D.Double beforeTurnPoint = roombaUtilities.getPointOnCircle(radians, centerRadius, changeInRadians < 0);
+
+                // Get the point on the turn circle after the turn (radians + changeInRadians)
+                Point2D.Double afterTurnPoint = roombaUtilities.getPointOnCircle(radians + changeInRadians, centerRadius, changeInRadians < 0);
+
+                // Find the difference
+                Point2D.Double positionChange = new Point2D.Double(afterTurnPoint.x - beforeTurnPoint.x, afterTurnPoint.y - beforeTurnPoint.y);
+
                 radians += changeInRadians;
+                position.setLocation(position.getX() + positionChange.x, position.getY() + positionChange.y);
+            } else {
+                double changeInX = roombaUtilities.getFarSideLength(radians, changeInStraightDistance);
+                double changeInY = roombaUtilities.getNearSideLength(radians, changeInStraightDistance);
+                position.setLocation(position.getX() + changeInX, position.getY() + changeInY);
             }
-
-            // TODO: near side being X or Y may depend on the current angle of roomba, i think the current wat will always be correct...
-            // TODO: also need to think about negative radians being passed in here, i think it is ok as is...
-            double changeInX = roombaUtilities.getFarSideLength(radians, changeInStraightDistance);
-            double changeInY = roombaUtilities.getNearSideLength(radians, changeInStraightDistance);
-
-            position.setLocation(position.getX() + changeInX, position.getY() + changeInY);
-
             System.out.println("Position updated to: " + position.toString() + ", radians: " + radians + ", degrees: " + Math.toDegrees(radians));
         }
+    }
+
+    public Point2D.Double getPosition() {
+        return position;
+    }
+
+    public double getRadians() {
+        return radians;
+    }
+
+    public double getDegrees() {
+        return Math.toDegrees(radians);
     }
 }
