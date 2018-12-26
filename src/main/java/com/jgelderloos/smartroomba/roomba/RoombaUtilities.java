@@ -1,7 +1,6 @@
 /*
  *  SmartRoomba - RoombaUtilities
  *
- *  Copyright (c) 2006 Tod E. Kurt, tod@todbot.com, ThingM
  *  Copyright (c) 2018 Jon Gelderloos
  *
  *  This library is free software; you can redistribute it and/or
@@ -24,6 +23,8 @@
 package com.jgelderloos.smartroomba.roomba;
 
 import com.jgelderloos.smartroomba.roomba.RoombaConstants.SensorPacketGroup;
+import com.jgelderloos.smartroomba.roomba.RoombaConstants.Direction;
+import com.jgelderloos.smartroomba.roomba.RoombaConstants.Side;
 
 import java.awt.geom.Point2D;
 import java.util.HashMap;
@@ -88,9 +89,9 @@ public class RoombaUtilities {
         return hypotenuse * Math.sin(angle);
     }
 
-    public Point2D.Double getPointOnCircle(double radians, double radius, boolean isRightTurn) {
+    public Point2D.Double getPointOnCircle(double radians, double radius, RoombaConstants.Side side, RoombaConstants.Direction direction) {
         double radiansToUse = radians;
-        if (isRightTurn) {
+        if ((side == Side.RIGHT && direction == Direction.FORWARDS) || (side == Side.LEFT && direction == Direction.BACKWARDS)) {
             radiansToUse += Math.PI;
         }
         return new Point2D.Double(getLength(radiansToUse, radius), getHeight(radiansToUse, radius));
@@ -102,5 +103,24 @@ public class RoombaUtilities {
 
     public double getLength(double radians, double radius) {
         return radius * Math.cos(radians);
+    }
+
+    public int getChangeInEncoderCounts(int lastCount, int currentCount) {
+        int count = currentCount - lastCount;
+        int testBackwardsRollCount = currentCount - (lastCount + RoombaConstants.MAX_ENCODER_COUNT);
+        int testForwardsRollCount = (currentCount + RoombaConstants.MAX_ENCODER_COUNT) - lastCount;
+
+        // Detect a rollover by seeing the sign will flip, and that the original count is very close to the max value that the
+        // encoder bytes can hold.
+        if (!isSameSign(count, testForwardsRollCount) && Math.abs(count) > RoombaConstants.MAX_ENCODER_COUNT - 10000) {
+            return testForwardsRollCount;
+        } else if (!isSameSign(count, testBackwardsRollCount) && Math.abs(count) > RoombaConstants.MAX_ENCODER_COUNT - 10000) {
+            return testBackwardsRollCount;
+        }
+        return count;
+    }
+
+    public boolean isSameSign(int first, int second) {
+        return (first ^ second) >= 0;
     }
 }

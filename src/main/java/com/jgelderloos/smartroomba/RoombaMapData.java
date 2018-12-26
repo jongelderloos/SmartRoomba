@@ -23,6 +23,8 @@
 package com.jgelderloos.smartroomba;
 
 import com.jgelderloos.smartroomba.roomba.RoombaConstants;
+import com.jgelderloos.smartroomba.roomba.RoombaConstants.Direction;
+import com.jgelderloos.smartroomba.roomba.RoombaConstants.Side;
 import com.jgelderloos.smartroomba.roomba.RoombaUtilities;
 import com.jgelderloos.smartroomba.roomba.SensorData;
 
@@ -47,9 +49,11 @@ public class RoombaMapData {
             lastLeftEncoderCount = currentLeftEncoderCount;
             lastRightEncoderCount = currentRightEncoderCount;
         } else {
-            int changeInLeftEncoderCounts = currentLeftEncoderCount - lastLeftEncoderCount;
+            //int changeInLeftEncoderCounts = currentLeftEncoderCount - lastLeftEncoderCount;
+            int changeInLeftEncoderCounts = roombaUtilities.getChangeInEncoderCounts(lastLeftEncoderCount, currentLeftEncoderCount);
             lastLeftEncoderCount = currentLeftEncoderCount;
-            int changeInRightEncoderCounts = currentRightEncoderCount - lastRightEncoderCount;
+            //int changeInRightEncoderCounts = currentRightEncoderCount - lastRightEncoderCount;
+            int changeInRightEncoderCounts = roombaUtilities.getChangeInEncoderCounts(lastRightEncoderCount, currentRightEncoderCount);
             lastRightEncoderCount = currentRightEncoderCount;
             double changeInLeftDistance = roombaUtilities.getMilimetersFromEncoderCounts(changeInLeftEncoderCounts);
             double changeInRightDistance = roombaUtilities.getMilimetersFromEncoderCounts(changeInRightEncoderCounts);
@@ -72,18 +76,23 @@ public class RoombaMapData {
 
                 // The smaller distance is the inside of the the turn
                 double outerDistance;
+                RoombaConstants.Direction direction;
                 // TODO: handle negative distances
                 if (changeInLeftDistance > changeInRightDistance) {
                     if (changeInLeftDistance > 0 && changeInRightDistance > 0) {
                         outerDistance = changeInLeftDistance;
+                        direction = Direction.FORWARDS;
                     } else {
                         outerDistance = changeInRightDistance;
+                        direction = Direction.BACKWARDS;
                     }
                 } else {
                     if (changeInLeftDistance > 0 && changeInRightDistance > 0) {
                         outerDistance = changeInRightDistance;
+                        direction = Direction.FORWARDS;
                     } else {
                         outerDistance = changeInLeftDistance;
+                        direction = Direction.BACKWARDS;
                     }
                 }
 
@@ -98,11 +107,12 @@ public class RoombaMapData {
                 // TODO: not sure this is needed for anything
                 double turnRadians = roombaUtilities.getTurnRadians(changeInRadians, changeInStraightDistance, centerRadius);
 
+                Side side = changeInRadians < 0 ? Side.RIGHT : Side.LEFT;
                 // Get the point on the turn circle prior to the turn (radians)
-                Point2D.Double beforeTurnPoint = roombaUtilities.getPointOnCircle(radians, centerRadius, changeInRadians < 0);
+                Point2D.Double beforeTurnPoint = roombaUtilities.getPointOnCircle(radians, centerRadius, side, direction);
 
                 // Get the point on the turn circle after the turn (radians + changeInRadians)
-                Point2D.Double afterTurnPoint = roombaUtilities.getPointOnCircle(radians + changeInRadians, centerRadius, changeInRadians < 0);
+                Point2D.Double afterTurnPoint = roombaUtilities.getPointOnCircle(radians + changeInRadians, centerRadius, side, direction);
 
                 // Find the difference
                 Point2D.Double positionChange = new Point2D.Double(afterTurnPoint.x - beforeTurnPoint.x, afterTurnPoint.y - beforeTurnPoint.y);
