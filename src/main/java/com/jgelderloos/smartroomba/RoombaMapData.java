@@ -49,10 +49,8 @@ public class RoombaMapData {
             lastLeftEncoderCount = currentLeftEncoderCount;
             lastRightEncoderCount = currentRightEncoderCount;
         } else {
-            //int changeInLeftEncoderCounts = currentLeftEncoderCount - lastLeftEncoderCount;
             int changeInLeftEncoderCounts = roombaUtilities.getChangeInEncoderCounts(lastLeftEncoderCount, currentLeftEncoderCount);
             lastLeftEncoderCount = currentLeftEncoderCount;
-            //int changeInRightEncoderCounts = currentRightEncoderCount - lastRightEncoderCount;
             int changeInRightEncoderCounts = roombaUtilities.getChangeInEncoderCounts(lastRightEncoderCount, currentRightEncoderCount);
             lastRightEncoderCount = currentRightEncoderCount;
             double changeInLeftDistance = roombaUtilities.getMilimetersFromEncoderCounts(changeInLeftEncoderCounts);
