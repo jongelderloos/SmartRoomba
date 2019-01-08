@@ -12,10 +12,13 @@ plugins {
 
     // Apply the application plugin to add support for building an application
     id 'application'
+
+    id 'org.openjfx.javafxplugin' version '0.0.5'
 }
 
 // Define the main class for the application
-mainClassName = 'RoombaCommTest'
+//mainClassName = 'com.jgelderloos.smartroomba.SmartRoombaMain'
+mainClassName = 'com.jgelderloos.smartroomba.RoombaViewer'
 
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
@@ -48,3 +51,10 @@ jar {
         }
     }
 }
+
+javafx {
+    modules = ['javafx.controls']
+    version = "11.0.+"
+}
+
+

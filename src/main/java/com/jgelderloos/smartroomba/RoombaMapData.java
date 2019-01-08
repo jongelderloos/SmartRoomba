@@ -38,7 +38,7 @@ public class RoombaMapData {
     private boolean processedFirstSensorData = false;
     private RoombaUtilities roombaUtilities = new RoombaUtilities();
 
-    public void processSensorData(SensorData sensorData) {
+    public RoombaPosition processSensorData(SensorData sensorData) {
         short distance = sensorData.getDistance();
         short sensorAngle = sensorData.getAngle();
         int currentLeftEncoderCount = sensorData.getLeftEncoderCount();
@@ -124,6 +124,7 @@ public class RoombaMapData {
             }
             System.out.println("Position updated to: " + position.toString() + ", radians: " + radians + ", degrees: " + Math.toDegrees(radians));
         }
+        return new RoombaPosition(position, radians, getDegrees());
     }
 
     public Point2D.Double getPosition() {

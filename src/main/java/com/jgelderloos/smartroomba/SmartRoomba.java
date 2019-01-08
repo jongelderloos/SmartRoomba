@@ -32,6 +32,8 @@ import com.jgelderloos.smartroomba.utilities.DataCSV;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.jgelderloos.smartroomba.roomba.RoombaConstants.SensorPacketGroup.P100;
 
@@ -42,6 +44,7 @@ public class SmartRoomba {
     private DataCSV dataCSV;
     private RoombaUtilities roombaUtilities;
     private RoombaMapData roombaMapData;
+    private List<RoombaPosition> positionList;
 
     public SmartRoomba(RoombaComm roombaComm, String comPort, int pauseTime, boolean debug, boolean hwHandshake,
            DataCSV dataCSV) {
@@ -51,6 +54,7 @@ public class SmartRoomba {
         this.dataCSV = dataCSV;
         roombaUtilities = new RoombaUtilities();
         roombaMapData = new RoombaMapData();
+        positionList = new ArrayList<>();
 
         roombaComm.debug = debug;
 
@@ -139,7 +143,8 @@ public class SmartRoomba {
             roombaComm.send(OpCodes.START.getId());
             System.out.println("Unsafe condition detected by sensors. Stopping Roomba");
         } else {
-            roombaMapData.processSensorData(sensorData);
+            RoombaPosition roombaPosition = roombaMapData.processSensorData(sensorData);
+            positionList.add(roombaPosition);
         }
     }
 
