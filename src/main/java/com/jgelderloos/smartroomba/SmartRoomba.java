@@ -23,6 +23,8 @@
 package com.jgelderloos.smartroomba;
 
 import com.jgelderloos.smartroomba.roomba.RoombaConstants.OpCodes;
+import com.jgelderloos.smartroomba.roomba.RoombaInfo;
+import com.jgelderloos.smartroomba.roomba.RoombaMapData;
 import com.jgelderloos.smartroomba.roomba.RoombaUtilities;
 import com.jgelderloos.smartroomba.roomba.SensorData;
 import com.jgelderloos.smartroomba.roombacomm.RoombaComm;
@@ -32,29 +34,28 @@ import com.jgelderloos.smartroomba.utilities.DataCSV;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Queue;
 
 import static com.jgelderloos.smartroomba.roomba.RoombaConstants.SensorPacketGroup.P100;
 
-public class SmartRoomba {
+public class SmartRoomba implements Runnable {
     private RoombaComm roombaComm;
     private String comPort;
     private int pauseTime;
     private DataCSV dataCSV;
+    private Queue<RoombaInfo> roombaInfoQueue;
     private RoombaUtilities roombaUtilities;
     private RoombaMapData roombaMapData;
-    private List<RoombaPosition> positionList;
 
     public SmartRoomba(RoombaComm roombaComm, String comPort, int pauseTime, boolean debug, boolean hwHandshake,
-           DataCSV dataCSV) {
+           DataCSV dataCSV, Queue<RoombaInfo> roombaInfoQueue) {
         this.roombaComm = roombaComm;
         this.comPort = comPort;
         this.pauseTime = pauseTime;
         this.dataCSV = dataCSV;
-        roombaUtilities = new RoombaUtilities();
-        roombaMapData = new RoombaMapData();
-        positionList = new ArrayList<>();
+        this.roombaInfoQueue = roombaInfoQueue;
+        this.roombaUtilities = new RoombaUtilities();
+        this.roombaMapData = new RoombaMapData();
 
         roombaComm.debug = debug;
 
@@ -70,7 +71,7 @@ public class SmartRoomba {
     public void run() {
         if (!roombaComm.connect(comPort)) {
             System.out.println("Couldn't connect to "+ comPort);
-            System.exit(1);
+            return;
         }
 
         System.out.println("Roomba startup");
@@ -143,8 +144,8 @@ public class SmartRoomba {
             roombaComm.send(OpCodes.START.getId());
             System.out.println("Unsafe condition detected by sensors. Stopping Roomba");
         } else {
-            RoombaPosition roombaPosition = roombaMapData.processSensorData(sensorData);
-            positionList.add(roombaPosition);
+            RoombaInfo roombaInfo = roombaMapData.processSensorData(sensorData);
+            roombaInfoQueue.add(roombaInfo);
         }
     }
 

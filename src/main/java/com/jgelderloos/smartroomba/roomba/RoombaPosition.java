@@ -1,16 +1,19 @@
-package com.jgelderloos.smartroomba;
+package com.jgelderloos.smartroomba.roomba;
 
 import java.awt.geom.Point2D;
+import java.time.LocalDateTime;
 
 public class RoombaPosition {
     private Point2D.Double position;
     private double radians;
     private double degrees;
+    private LocalDateTime dateTime;
 
-    public RoombaPosition(Point2D.Double position, double radians, double degrees) {
+    public RoombaPosition(Point2D.Double position, double radians, double degrees, LocalDateTime dateTime) {
         this.position = position;
         this.radians = radians;
         this.degrees = degrees;
+        this.dateTime = dateTime;
     }
 
     public Point2D.Double getPosition() {
@@ -36,4 +39,13 @@ public class RoombaPosition {
     public void setDegrees(double degrees) {
         this.degrees = degrees;
     }
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
 }

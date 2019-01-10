@@ -36,6 +36,7 @@ import org.apache.commons.cli.ParseException;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SmartRoombaMain {
 
@@ -105,8 +106,10 @@ public class SmartRoombaMain {
             } catch (NumberFormatException ex) {
                 roombaComm = new RoombaCommPlaybackMode();
             }
-            SmartRoomba smartRoomba = new SmartRoomba(roombaComm, comport, pauseTime, debug, hwhandshake, dataCSV);
-            smartRoomba.run();
+
+            SmartRoomba smartRoomba = new SmartRoomba(roombaComm, comport, pauseTime, debug, hwhandshake, dataCSV, new ConcurrentLinkedQueue<>());
+            Thread smartRoombaThread = new Thread(smartRoomba);
+            smartRoombaThread.start();
         }
     }
 }

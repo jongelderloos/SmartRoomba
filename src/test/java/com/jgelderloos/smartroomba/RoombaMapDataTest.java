@@ -23,6 +23,7 @@
 package com.jgelderloos.smartroomba;
 
 import com.jgelderloos.smartroomba.roomba.RoombaConstants;
+import com.jgelderloos.smartroomba.roomba.RoombaMapData;
 import com.jgelderloos.smartroomba.roomba.SensorData;
 import org.junit.Assert;
 import org.junit.Before;

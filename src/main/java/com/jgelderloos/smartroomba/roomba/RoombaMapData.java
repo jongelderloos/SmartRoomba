@@ -20,13 +20,10 @@
  *
  */
 
-package com.jgelderloos.smartroomba;
+package com.jgelderloos.smartroomba.roomba;
 
-import com.jgelderloos.smartroomba.roomba.RoombaConstants;
 import com.jgelderloos.smartroomba.roomba.RoombaConstants.Direction;
 import com.jgelderloos.smartroomba.roomba.RoombaConstants.Side;
-import com.jgelderloos.smartroomba.roomba.RoombaUtilities;
-import com.jgelderloos.smartroomba.roomba.SensorData;
 
 import java.awt.geom.Point2D;
 
@@ -38,7 +35,7 @@ public class RoombaMapData {
     private boolean processedFirstSensorData = false;
     private RoombaUtilities roombaUtilities = new RoombaUtilities();
 
-    public RoombaPosition processSensorData(SensorData sensorData) {
+    public RoombaInfo processSensorData(SensorData sensorData) {
         short distance = sensorData.getDistance();
         short sensorAngle = sensorData.getAngle();
         int currentLeftEncoderCount = sensorData.getLeftEncoderCount();
@@ -124,7 +121,7 @@ public class RoombaMapData {
             }
             System.out.println("Position updated to: " + position.toString() + ", radians: " + radians + ", degrees: " + Math.toDegrees(radians));
         }
-        return new RoombaPosition(position, radians, getDegrees());
+        return new RoombaInfo(new RoombaPosition(position, radians, getDegrees(), sensorData.getDateTime()), sensorData);
     }
 
     public Point2D.Double getPosition() {
