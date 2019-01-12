@@ -30,6 +30,8 @@ import com.jgelderloos.smartroomba.utilities.DataCSV;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -93,12 +95,19 @@ class MainPanel extends JPanel {
     private Point endMove;
     private Point moved = null;
     private List<RoombaInfo> roombaInfoList;
+    private int currentRoombaInfoIndex;
     private int[] zoomLevelMillisPerPixel = {1, 2, 3, 4, 5, 10 ,20, 30};
     private int currentZoomLevel = 2;
     private int[] zoomLevelMillisGridSpacing = {25, 50, 50, 100, 100, 100, 200, 400};
 
     public MainPanel(List<RoombaInfo> roombaInfoList) {
+        this.setFocusable(true);
         this.roombaInfoList = roombaInfoList;
+        if (!this.roombaInfoList.isEmpty()) {
+            currentRoombaInfoIndex = this.roombaInfoList.size() - 1;
+        } else {
+            currentRoombaInfoIndex = 0;
+        }
 
         setBorder(BorderFactory.createLineBorder(Color.black));
 
@@ -130,6 +139,18 @@ class MainPanel extends JPanel {
                 incrementZoomLevel(change);
             }
         });
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent event) {
+                int keyCode = event.getKeyCode();
+                if (keyCode == 37) {
+                    incrementCurrentRoombaInfo(-1);
+                } else if (keyCode == 39) {
+                    incrementCurrentRoombaInfo(1);
+                }
+            }
+        });
     }
 
     public void updateForZoomLevel(int millisPerPixel, int millisGridSpacing) {
@@ -153,6 +174,18 @@ class MainPanel extends JPanel {
 
     public void addRoombaInfo(RoombaInfo roombaInfo) {
         roombaInfoList.add(roombaInfo);
+        currentRoombaInfoIndex = roombaInfoList.size() - 1;
+        repaint();
+    }
+
+    public void incrementCurrentRoombaInfo(int change) {
+        currentRoombaInfoIndex += change;
+        if (currentRoombaInfoIndex < 0) {
+            currentRoombaInfoIndex = 0;
+        } else if (currentRoombaInfoIndex > roombaInfoList.size() -1) {
+            currentRoombaInfoIndex = roombaInfoList.size() - 1;
+        }
+        System.out.println("Current Roomba Index: " + currentRoombaInfoIndex);
         repaint();
     }
 
@@ -165,25 +198,38 @@ class MainPanel extends JPanel {
     public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         paintGrid(graphics);
-        paintRoomba(graphics);
+        paintRoombas(graphics);
     }
 
-    private void paintRoomba(Graphics graphics) {
+    private void paintRoombas(Graphics graphics) {
         for (RoombaInfo roombaInfo : roombaInfoList) {
-            // Get the x and y position of the center of the roomba in pixels.
-            int xPos = (int)(roombaInfo.getPosition().getPosition().x / millisPerPixel) + origin.x - roombaPxHalfDiameter;
-            int yPos = (int)(-1 * roombaInfo.getPosition().getPosition().y / millisPerPixel) + origin.y - roombaPxHalfDiameter;
-            // Draw the roomba
-            graphics.fillOval(xPos, yPos, roombaPxDiameter, roombaPxDiameter);
+            paintRoomba(graphics, roombaInfo, false);
+        }
+        paintRoomba(graphics, roombaInfoList.get(currentRoombaInfoIndex), true);
+    }
+
+    private void paintRoomba(Graphics graphics, RoombaInfo roombaInfo, boolean isFocus) {
+        if (isFocus) {
+            graphics.setColor(Color.BLACK);
+        } else {
+            graphics.setColor(Color.GRAY);
+        }
+        // Get the x and y position of the center of the roomba in pixels.
+        int xPos = (int)(roombaInfo.getPosition().getPosition().x / millisPerPixel) + origin.x - roombaPxHalfDiameter;
+        int yPos = (int)(-1 * roombaInfo.getPosition().getPosition().y / millisPerPixel) + origin.y - roombaPxHalfDiameter;
+        // Draw the roomba
+        graphics.fillOval(xPos, yPos, roombaPxDiameter, roombaPxDiameter);
+        if (isFocus) {
             graphics.setColor(Color.RED);
             // Draw a dot and line on the roomba to show which direction it is pointing
-            graphics.fillOval(xPos + roombaPxHalfDiameter - (int)(Math.sin(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter),
-                    yPos + roombaPxHalfDiameter - (int)(Math.cos(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter), 5, 5);
+            graphics.fillOval(xPos + roombaPxHalfDiameter - (int) (Math.sin(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter),
+                    yPos + roombaPxHalfDiameter - (int) (Math.cos(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter), 5, 5);
             graphics.drawLine(xPos + roombaPxHalfDiameter, yPos + roombaPxHalfDiameter,
-                    xPos + roombaPxHalfDiameter - (int)(Math.sin(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter),
-                    yPos + roombaPxHalfDiameter - (int)(Math.cos(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter));
-            graphics.setColor(Color.BLACK);
+                    xPos + roombaPxHalfDiameter - (int) (Math.sin(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter),
+                    yPos + roombaPxHalfDiameter - (int) (Math.cos(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter));
         }
+        graphics.setColor(Color.BLACK);
+
     }
 
     private void paintGrid(Graphics graphics) {
