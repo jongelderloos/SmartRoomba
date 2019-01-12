@@ -103,7 +103,6 @@ public class SmartRoomba implements Runnable {
             boolean dataAvailable = true;
             while (dataAvailable) {
                 SensorData sensorData = roombaComm.getSensorDataQueue().poll();
-                // If a valid dataCsv has been supplied then it will record
                 if (sensorData != null) {
                     lastSensorUpdate = LocalDateTime.now();
                     System.out.println("Sensor Data: " + dataCount + " " + lastSensorUpdate.toString());
@@ -124,12 +123,7 @@ public class SmartRoomba implements Runnable {
                 System.out.println("No sensor data in over " + sensorCheckInterval/1000 + " seconds. Make sure the Roomba is on.");
             }
 
-            //roombaComm.pause(pauseTime);
-            try {
-                Thread.sleep(pauseTime);
-            } catch (Exception e) {
-                System.out.println("Exception sleeping while wait for DSR");
-            }
+            roombaUtilities.sleep(pauseTime, "waiting for DSR");
 
         }
         System.out.println("Disconnecting");

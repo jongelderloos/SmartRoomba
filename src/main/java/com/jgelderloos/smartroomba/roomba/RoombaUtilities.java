@@ -50,6 +50,14 @@ public class RoombaUtilities {
         sensorPackSizeMap.put(SensorPacketGroup.P107, 9);
     }
 
+    public void sleep(int millis, String whileString) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ex) {
+            System.out.println("InterruptedException sleeping while " + whileString);
+            Thread.currentThread().interrupt();
+        }
+    }
     // TODO: null handling
     public int getSensorPacketSize(SensorPacketGroup packet) {
         return sensorPackSizeMap.get(packet);

@@ -121,7 +121,7 @@ public class RoombaMapData {
             }
             System.out.println("Position updated to: " + position.toString() + ", radians: " + radians + ", degrees: " + Math.toDegrees(radians));
         }
-        return new RoombaInfo(new RoombaPosition(position, radians, getDegrees(), sensorData.getDateTime()), sensorData);
+        return new RoombaInfo(new RoombaPosition(new Point2D.Double(position.x, position.y), radians, getDegrees(), sensorData.getDateTime()), sensorData);
     }
 
     public Point2D.Double getPosition() {
