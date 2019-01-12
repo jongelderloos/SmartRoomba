@@ -32,6 +32,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -92,17 +93,17 @@ class MainPanel extends JPanel {
     private Point endMove;
     private Point moved = null;
     private List<RoombaInfo> roombaInfoList;
+    private int[] zoomLevelMillisPerPixel = {1, 2, 3, 4, 5, 10 ,20, 30};
+    private int currentZoomLevel = 2;
+    private int[] zoomLevelMillisGridSpacing = {25, 50, 50, 100, 100, 100, 200, 400};
 
     public MainPanel(List<RoombaInfo> roombaInfoList) {
         this.roombaInfoList = roombaInfoList;
 
         setBorder(BorderFactory.createLineBorder(Color.black));
+
         origin = new Point(getPreferredSize().width / 2, getPreferredSize().height / 2);
-        millisPerPixel = 5;
-        millisGridSpacing = 100;
-        pixelsPerGrid = millisGridSpacing / millisPerPixel;
-        roombaPxDiameter = (int)RoombaConstants.WHEELBASE / millisPerPixel;
-        roombaPxHalfDiameter = roombaPxDiameter / 2;
+        updateForZoomLevel(zoomLevelMillisPerPixel[currentZoomLevel], zoomLevelMillisGridSpacing[currentZoomLevel]);
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -121,6 +122,33 @@ class MainPanel extends JPanel {
                 repaint();
             }
         });
+
+        addMouseWheelListener(new MouseAdapter() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent event) {
+                int change = event.getWheelRotation();
+                incrementZoomLevel(change);
+            }
+        });
+    }
+
+    public void updateForZoomLevel(int millisPerPixel, int millisGridSpacing) {
+        this.millisPerPixel = millisPerPixel;
+        this.millisGridSpacing = millisGridSpacing;
+        pixelsPerGrid = millisGridSpacing / this.millisPerPixel;
+        roombaPxDiameter = (int)RoombaConstants.WHEELBASE / this.millisPerPixel;
+        roombaPxHalfDiameter = roombaPxDiameter / 2;
+        repaint();
+    }
+
+    public void incrementZoomLevel(int change) {
+        currentZoomLevel += change;
+        if (currentZoomLevel < 0) {
+            currentZoomLevel = 0;
+        } else if (currentZoomLevel > zoomLevelMillisPerPixel.length -1) {
+            currentZoomLevel = zoomLevelMillisPerPixel.length - 1;
+        }
+        updateForZoomLevel(zoomLevelMillisPerPixel[currentZoomLevel], zoomLevelMillisGridSpacing[currentZoomLevel]);
     }
 
     public void addRoombaInfo(RoombaInfo roombaInfo) {
