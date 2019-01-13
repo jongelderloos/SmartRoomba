@@ -191,7 +191,6 @@ class MainPanel extends JPanel {
         } else if (currentRoombaInfoIndex > roombaInfoList.size() -1) {
             currentRoombaInfoIndex = roombaInfoList.size() - 1;
         }
-        System.out.println("Current Roomba Index: " + currentRoombaInfoIndex);
         repaint();
     }
 
@@ -272,33 +271,52 @@ class MainPanel extends JPanel {
 
     private void paintRoombas(Graphics graphics) {
         for (RoombaInfo roombaInfo : roombaInfoList) {
-            paintRoomba(graphics, roombaInfo, false);
+            paintRoombaShadow(graphics, roombaInfo);
         }
-        paintRoomba(graphics, roombaInfoList.get(currentRoombaInfoIndex), true);
+        RoombaInfo previousRoombaInfo = null;
+        for (RoombaInfo roombaInfo : roombaInfoList) {
+            paintRoombaPath(graphics, roombaInfo, previousRoombaInfo);
+            previousRoombaInfo = roombaInfo;
+        }
+        paintFocusedRoomba(graphics, roombaInfoList.get(currentRoombaInfoIndex));
     }
 
-    private void paintRoomba(Graphics graphics, RoombaInfo roombaInfo, boolean isFocus) {
-        if (isFocus) {
-            graphics.setColor(Color.BLACK);
-        } else {
-            graphics.setColor(Color.GRAY);
-        }
+    private void paintRoombaShadow(Graphics graphics, RoombaInfo roombaInfo) {
+        graphics.setColor(Color.GRAY);
         // Get the x and y position of the center of the roomba in pixels.
         int xPos = (int)(roombaInfo.getPosition().getPosition().x / millisPerPixel) + origin.x - roombaPxHalfDiameter;
         int yPos = (int)(-1 * roombaInfo.getPosition().getPosition().y / millisPerPixel) + origin.y - roombaPxHalfDiameter;
         // Draw the roomba
         graphics.fillOval(xPos, yPos, roombaPxDiameter, roombaPxDiameter);
-        if (isFocus) {
-            graphics.setColor(Color.RED);
-            // Draw a dot and line on the roomba to show which direction it is pointing
-            graphics.fillOval(xPos + roombaPxHalfDiameter - (int) (Math.sin(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter),
-                    yPos + roombaPxHalfDiameter - (int) (Math.cos(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter), 5, 5);
-            graphics.drawLine(xPos + roombaPxHalfDiameter, yPos + roombaPxHalfDiameter,
-                    xPos + roombaPxHalfDiameter - (int) (Math.sin(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter),
-                    yPos + roombaPxHalfDiameter - (int) (Math.cos(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter));
-        }
         graphics.setColor(Color.BLACK);
+    }
 
+    private void paintRoombaPath(Graphics graphics, RoombaInfo roombaInfo, RoombaInfo previousRoombaInfo) {
+         if (previousRoombaInfo != null) {
+            graphics.setColor(Color.BLUE);
+            int xPos = (int)(roombaInfo.getPosition().getPosition().x / millisPerPixel) + origin.x;
+            int yPos = (int)(-1 * roombaInfo.getPosition().getPosition().y / millisPerPixel) + origin.y;
+            int xPrevPos = (int)(previousRoombaInfo.getPosition().getPosition().x / millisPerPixel) + origin.x;
+            int yPrevPos = (int)(-1 * previousRoombaInfo.getPosition().getPosition().y / millisPerPixel) + origin.y;
+            graphics.drawLine(xPos, yPos, xPrevPos, yPrevPos);
+            graphics.setColor(Color.BLACK);
+        }
+    }
+
+    private void paintFocusedRoomba(Graphics graphics, RoombaInfo roombaInfo) {
+        graphics.setColor(Color.BLACK);
+        int xPos = (int)(roombaInfo.getPosition().getPosition().x / millisPerPixel) + origin.x - roombaPxHalfDiameter;
+        int yPos = (int)(-1 * roombaInfo.getPosition().getPosition().y / millisPerPixel) + origin.y - roombaPxHalfDiameter;
+        // Draw the roomba
+        graphics.fillOval(xPos, yPos, roombaPxDiameter, roombaPxDiameter);
+        graphics.setColor(Color.RED);
+        // Draw a dot and line on the roomba to show which direction it is pointing
+        graphics.fillOval(xPos + roombaPxHalfDiameter - (int) (Math.sin(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter),
+                yPos + roombaPxHalfDiameter - (int) (Math.cos(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter), 5, 5);
+        graphics.drawLine(xPos + roombaPxHalfDiameter, yPos + roombaPxHalfDiameter,
+                xPos + roombaPxHalfDiameter - (int) (Math.sin(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter),
+                yPos + roombaPxHalfDiameter - (int) (Math.cos(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter));
+        graphics.setColor(Color.BLACK);
     }
 
     private void paintGrid(Graphics graphics) {
