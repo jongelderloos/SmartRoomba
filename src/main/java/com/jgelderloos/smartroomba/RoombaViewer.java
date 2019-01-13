@@ -35,6 +35,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -98,7 +100,9 @@ class MainPanel extends JPanel {
     private int currentRoombaInfoIndex;
     private int[] zoomLevelMillisPerPixel = {1, 2, 3, 4, 5, 10 ,20, 30};
     private int currentZoomLevel = 2;
-    private int[] zoomLevelMillisGridSpacing = {25, 50, 50, 100, 100, 100, 200, 400};
+    private int[] zoomLevelMillisGridSpacing = {25, 50, 75, 100, 200, 300, 600, 1200};
+    private NumberFormat formatter;
+    private NumberFormat scaleFormatter;
 
     public MainPanel(List<RoombaInfo> roombaInfoList) {
         this.setFocusable(true);
@@ -109,6 +113,8 @@ class MainPanel extends JPanel {
             currentRoombaInfoIndex = 0;
         }
 
+        formatter = new DecimalFormat("#0.00");
+        scaleFormatter = new DecimalFormat("#0.00");
         setBorder(BorderFactory.createLineBorder(Color.black));
 
         origin = new Point(getPreferredSize().width / 2, getPreferredSize().height / 2);
@@ -199,6 +205,69 @@ class MainPanel extends JPanel {
         super.paintComponent(graphics);
         paintGrid(graphics);
         paintRoombas(graphics);
+        paintInfoText(graphics);
+        paintScaleText(graphics);
+    }
+
+    private void paintInfoText(Graphics graphics) {
+        int positionX = 5;
+        int positionY = 5;
+        int angleX = 5;
+        int angleY = positionY + graphics.getFontMetrics().getHeight();
+        String positionString = "Roomba position: " + formatter.format(roombaInfoList.get(currentRoombaInfoIndex).getPosition().getPosition().x)
+                + ", " + formatter.format(roombaInfoList.get(currentRoombaInfoIndex).getPosition().getPosition().y);
+        String angleString = "Roomba angle: " + formatter.format(roombaInfoList.get(currentRoombaInfoIndex).getPosition().getDegrees()) + "\u00b0";
+        graphics.setColor(Color.WHITE);
+        graphics.fillRect(positionX, positionY, graphics.getFontMetrics().stringWidth(positionString) + 4, graphics.getFontMetrics().getHeight());
+        graphics.fillRect(angleX, angleY, graphics.getFontMetrics().stringWidth(angleString) + 4, graphics.getFontMetrics().getHeight());
+        graphics.setColor(Color.BLACK);
+        graphics.drawString(positionString, positionX + 2, positionY + graphics.getFontMetrics().getHeight() - 3);
+        graphics.drawString(angleString, angleX + 2, angleY + graphics.getFontMetrics().getHeight() - 3);
+    }
+
+    private void paintScaleText(Graphics graphics) {
+        int scaleX = 5;
+        int scaleGap = -3;
+        int scaleBarHeight = 10;
+        int scaleHorizontalPad = 30;
+        int scaleVerticalPad = 6;
+        int scaleY = this.getSize().height - (((graphics.getFontMetrics().getHeight() - 3) * 4) + (2 * scaleBarHeight) + scaleVerticalPad + 5);
+        String topScaleString = "Millimeters";
+        String bottomScaleString = "Meters";
+        graphics.setColor(Color.WHITE);
+        graphics.fillRect(scaleX, scaleY, (5 * pixelsPerGrid) + scaleHorizontalPad, ((graphics.getFontMetrics().getHeight() - 3) * 4) + (2 * scaleBarHeight) + scaleVerticalPad);
+        graphics.setColor(Color.BLACK);
+        graphics.drawString(topScaleString, scaleX + (((5 * pixelsPerGrid) + scaleHorizontalPad - graphics.getFontMetrics().stringWidth(topScaleString)) / 2),
+                scaleY + graphics.getFontMetrics().getHeight() - 3);
+        int millisPerGrid = pixelsPerGrid * millisPerPixel;
+        for (int i = 0; i < 6; i++) {
+            String valueString = String.valueOf(millisPerGrid * i);
+            graphics.drawString(valueString, scaleX + (scaleHorizontalPad / 2) - (graphics.getFontMetrics().stringWidth(valueString) / 2) + (i * pixelsPerGrid), scaleY + (graphics.getFontMetrics().getHeight() * 2) - 2);
+            graphics.fillRect(scaleX + (i * pixelsPerGrid) + (scaleHorizontalPad / 2), scaleY + scaleGap + (graphics.getFontMetrics().getHeight() * 2) + (scaleVerticalPad / 2), 1, scaleBarHeight);
+        }
+        graphics.fillRect(scaleX + (scaleHorizontalPad / 2), scaleY + scaleGap + (graphics.getFontMetrics().getHeight() * 2) + (scaleBarHeight + (scaleVerticalPad) / 2), (5 * pixelsPerGrid) + 1, 1);
+        int maxValue = 5 * millisPerGrid;
+        int increment = 1000;
+        while (increment > maxValue) {
+            if (increment == 250) {
+                increment = 100;
+            } else {
+                increment = increment / 2;
+            }
+        }
+        for (int i = 0; i <= maxValue; i += increment) {
+            double value = (double)i / 1000;
+            String valueString;
+            if (value == Math.floor(value)) {
+                valueString = String.valueOf((int)value);
+            } else {
+                valueString = scaleFormatter.format((double)i / 1000);
+            }
+            graphics.drawString(valueString, scaleX + (scaleHorizontalPad / 2) - (graphics.getFontMetrics().stringWidth(valueString) / 2) + (i / millisPerPixel), scaleY + (graphics.getFontMetrics().getHeight() * 3) + scaleBarHeight + 5);
+            graphics.fillRect(scaleX + (i / millisPerPixel) + (scaleHorizontalPad / 2), scaleY + scaleGap + (graphics.getFontMetrics().getHeight() * 2) + (scaleVerticalPad / 2) + scaleBarHeight, 1, scaleBarHeight);
+        }
+        graphics.drawString(bottomScaleString, scaleX + (((5 * pixelsPerGrid) + scaleHorizontalPad - graphics.getFontMetrics().stringWidth(bottomScaleString)) / 2),
+                scaleY + scaleGap + (graphics.getFontMetrics().getHeight() * 5) - 3);
     }
 
     private void paintRoombas(Graphics graphics) {
