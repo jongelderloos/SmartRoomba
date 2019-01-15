@@ -86,6 +86,10 @@ public class RoombaViewer {
     }
 }
 
+// TODO: add graphic for bumps or other sensor inputs
+// TODO: add buttons to step forward and backwards for current roomba (like the arrow keys)
+// TODO: add info text for sensor data number
+// TODO: add saving a set of sensor data along with positions.
 class MainPanel extends JPanel {
     private int millisPerPixel;
     private int roombaPxDiameter;
@@ -278,11 +282,14 @@ class MainPanel extends JPanel {
             paintRoombaPath(graphics, roombaInfo, previousRoombaInfo);
             previousRoombaInfo = roombaInfo;
         }
+        for (RoombaInfo roombaInfo : roombaInfoList) {
+            paintObstacles(graphics, roombaInfo);
+        }
         paintFocusedRoomba(graphics, roombaInfoList.get(currentRoombaInfoIndex));
     }
 
     private void paintRoombaShadow(Graphics graphics, RoombaInfo roombaInfo) {
-        graphics.setColor(Color.GRAY);
+        graphics.setColor(Color.LIGHT_GRAY);
         // Get the x and y position of the center of the roomba in pixels.
         int xPos = (int)(roombaInfo.getPosition().getPosition().x / millisPerPixel) + origin.x - roombaPxHalfDiameter;
         int yPos = (int)(-1 * roombaInfo.getPosition().getPosition().y / millisPerPixel) + origin.y - roombaPxHalfDiameter;
@@ -303,6 +310,27 @@ class MainPanel extends JPanel {
         }
     }
 
+    private void paintObstacles(Graphics graphics, RoombaInfo roombaInfo) {
+        if (roombaInfo.getSensorData().isBumpLeft() || roombaInfo.getSensorData().isBumpRight()) {
+            int xPos = (int)(roombaInfo.getPosition().getPosition().x / millisPerPixel) + origin.x - roombaPxHalfDiameter;
+            int yPos = (int)(-1 * roombaInfo.getPosition().getPosition().y / millisPerPixel) + origin.y - roombaPxHalfDiameter;
+            graphics.setColor(Color.RED);
+            if (roombaInfo.getSensorData().isBumpLeft()) {
+                graphics.drawArc(xPos, yPos, roombaPxDiameter, roombaPxDiameter, (int) roombaInfo.getPosition().getDegrees() + 90, (int) roombaInfo.getPosition().getDegrees() + 90);
+            }
+            if (roombaInfo.getSensorData().isBumpRight()) {
+                graphics.drawArc(xPos, yPos, roombaPxDiameter, roombaPxDiameter, (int) roombaInfo.getPosition().getDegrees(), (int) roombaInfo.getPosition().getDegrees() + 90);
+            }
+        }
+        if (roombaInfo.getSensorData().isLightBumperFrontRight()) {
+            graphics.setColor(Color.MAGENTA);
+            int xPos = (int)(roombaInfo.getPosition().getPosition().x / millisPerPixel) + origin.x;
+            int yPos = (int)(-1 * roombaInfo.getPosition().getPosition().y / millisPerPixel) + origin.y;
+            graphics.fillOval(xPos - (int)(roombaPxHalfDiameter * Math.sin(roombaInfo.getPosition().getRadians() - (Math.PI / 2))),
+                    yPos - (int)(roombaPxHalfDiameter * Math.cos(roombaInfo.getPosition().getRadians() - (Math.PI / 2))), 6, 6);
+        }
+    }
+
     private void paintFocusedRoomba(Graphics graphics, RoombaInfo roombaInfo) {
         graphics.setColor(Color.BLACK);
         int xPos = (int)(roombaInfo.getPosition().getPosition().x / millisPerPixel) + origin.x - roombaPxHalfDiameter;
@@ -316,6 +344,7 @@ class MainPanel extends JPanel {
         graphics.drawLine(xPos + roombaPxHalfDiameter, yPos + roombaPxHalfDiameter,
                 xPos + roombaPxHalfDiameter - (int) (Math.sin(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter),
                 yPos + roombaPxHalfDiameter - (int) (Math.cos(roombaInfo.getPosition().getRadians()) * roombaPxHalfDiameter));
+        paintObstacles(graphics, roombaInfo);
         graphics.setColor(Color.BLACK);
     }
 
