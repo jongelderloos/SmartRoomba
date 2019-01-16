@@ -7,7 +7,9 @@ import com.jgelderloos.smartroomba.utilities.ReplaySensorDataThread;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -16,14 +18,14 @@ public class RoombaCommPlaybackMode extends RoombaComm {
     private Queue<SensorData> sensorDataQueue;
     private Queue<SensorData> fileDataQueue;
     private DataCSVReader dataCSVReader;
-    private ReplaySensorDataThread replaySensorDataThread;
+    private Thread replaySensorDataThread;
 
     public RoombaCommPlaybackMode() {
         super();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
         fileDataQueue = new ConcurrentLinkedQueue<>();
         dataCSVReader = new DataCSVReader();
-        replaySensorDataThread = new ReplaySensorDataThread(sensorDataQueue, fileDataQueue);
+        replaySensorDataThread = new Thread(new ReplaySensorDataThread(sensorDataQueue, fileDataQueue));
     }
 
     public String[] listPorts() {
@@ -37,16 +39,17 @@ public class RoombaCommPlaybackMode extends RoombaComm {
     }
 
     public boolean connect(String portId) {
-        BufferedReader bufferedReader = null;
-        try {
-            FileReader fileReader = new FileReader(portId);
-            bufferedReader = new BufferedReader(fileReader);
+        List<String> fileData = new ArrayList<>();
+
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(portId))) {
+            dataCSVReader = new DataCSVReader(bufferedReader);
+            fileData = dataCSVReader.readData();
         } catch (FileNotFoundException ex) {
             System.out.println("FileNotFoundException. Could not find file: " + portId);
+        } catch (IOException ex) {
+            System.out.println("IOException. Could not close file: " + portId);
         }
 
-        dataCSVReader = new DataCSVReader(bufferedReader);
-        List<String> fileData = dataCSVReader.readData();
         boolean isFirstLine = true;
         for (String currentLine : fileData) {
             // Skip the file header on the first line
@@ -76,12 +79,12 @@ public class RoombaCommPlaybackMode extends RoombaComm {
             }
         }
 
-        Thread replayThread = new Thread(replaySensorDataThread);
-        replayThread.start();
+        replaySensorDataThread.start();
         return true;
     }
 
     public void disconnect() {
+        replaySensorDataThread.interrupt();
     }
 
     public boolean send(byte[] bytes) {
@@ -96,7 +99,9 @@ public class RoombaCommPlaybackMode extends RoombaComm {
         return false;
     }
 
+    @Override
     public void setReadRequestLength(int readRequestLength) {
+        // This is not applicable when replaying from a file as everything that was recorded will be returned
     }
 
 
