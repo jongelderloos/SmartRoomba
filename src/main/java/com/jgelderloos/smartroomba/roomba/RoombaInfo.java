@@ -35,15 +35,7 @@ public class RoombaInfo {
         return position;
     }
 
-    public void setPosition(RoombaPosition position) {
-        this.position = position;
-    }
-
     public SensorData getSensorData() {
         return sensorData;
-    }
-
-    public void setSensorData(SensorData sensorData) {
-        this.sensorData = sensorData;
     }
 }

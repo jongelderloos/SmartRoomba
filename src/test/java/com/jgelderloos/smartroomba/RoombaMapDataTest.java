@@ -23,6 +23,7 @@
 package com.jgelderloos.smartroomba;
 
 import com.jgelderloos.smartroomba.roomba.RoombaConstants;
+import com.jgelderloos.smartroomba.roomba.RoombaInfo;
 import com.jgelderloos.smartroomba.roomba.RoombaMapData;
 import com.jgelderloos.smartroomba.roomba.SensorData;
 import org.junit.Assert;
@@ -75,11 +76,11 @@ public class RoombaMapDataTest {
         byteArray[SensorData.PacketOffsets.RIGHT_ENCODER_COUNTS_HI.ordinal()] = 0;
         byteArray[SensorData.PacketOffsets.RIGHT_ENCODER_COUNTS_LO.ordinal()] = 0;
         sensorData = new SensorData(byteArray, SensorData.MAX_SENSOR_BYTES);
-        roombaMapData.processSensorData(sensorData);
+        RoombaInfo roombaInfo = roombaMapData.processSensorData(sensorData);
 
-        Assert.assertEquals(new Point2D.Double(0, 0), roombaMapData.getPosition());
-        Assert.assertEquals(0, roombaMapData.getRadians(), 0);
-        Assert.assertEquals(0, roombaMapData.getDegrees(), 0);
+        Assert.assertEquals(new Point2D.Double(0, 0), roombaInfo.getPosition().getPosition());
+        Assert.assertEquals(0, roombaInfo.getPosition().getRadians(), 0);
+        Assert.assertEquals(0, roombaInfo.getPosition().getDegrees(), 0);
     }
 
     /**
@@ -91,11 +92,11 @@ public class RoombaMapDataTest {
         double expectedRadians = Math.PI * -2 / 4;
         setEncoderCounts(innerRadius, expectedRadians, true, false);
         sensorData = new SensorData(byteArray, SensorData.MAX_SENSOR_BYTES);
-        roombaMapData.processSensorData(sensorData);
+        RoombaInfo roombaInfo = roombaMapData.processSensorData(sensorData);
 
-        Point2D.Double position = roombaMapData.getPosition();
-        double radians = roombaMapData.getRadians();
-        double degrees = roombaMapData.getDegrees();
+        Point2D.Double position = roombaInfo.getPosition().getPosition();
+        double radians = roombaInfo.getPosition().getRadians();
+        double degrees = roombaInfo.getPosition().getDegrees();
         Assert.assertEquals(innerRadius + (RoombaConstants.WHEELBASE / 2), position.x, tolerance);
         Assert.assertEquals(innerRadius + (RoombaConstants.WHEELBASE / 2), position.y, tolerance);
         Assert.assertEquals(expectedRadians, radians, tolerance / 10);
@@ -117,11 +118,11 @@ public class RoombaMapDataTest {
         expectedRadians = Math.PI * -2 / 4;
         setEncoderCounts(innerRadius, expectedRadians, true, false);
         sensorData = new SensorData(byteArray, SensorData.MAX_SENSOR_BYTES);
-        roombaMapData.processSensorData(sensorData);
+        RoombaInfo roombaInfo = roombaMapData.processSensorData(sensorData);
 
-        Point2D.Double position = roombaMapData.getPosition();
-        double radians = roombaMapData.getRadians();
-        double degrees = roombaMapData.getDegrees();
+        Point2D.Double position = roombaInfo.getPosition().getPosition();
+        double radians = roombaInfo.getPosition().getRadians();
+        double degrees = roombaInfo.getPosition().getDegrees();
         Assert.assertEquals(innerRadius + (RoombaConstants.WHEELBASE / 2), position.x, tolerance);
         Assert.assertEquals(innerRadius + (RoombaConstants.WHEELBASE / 2), position.y, tolerance);
         Assert.assertEquals(expectedRadians, radians, tolerance / 10);
@@ -137,11 +138,11 @@ public class RoombaMapDataTest {
         double expectedRadians = Math.PI * 2 / 4;
         setEncoderCounts(innerRadius, expectedRadians, false, false);
         sensorData = new SensorData(byteArray, SensorData.MAX_SENSOR_BYTES);
-        roombaMapData.processSensorData(sensorData);
+        RoombaInfo roombaInfo = roombaMapData.processSensorData(sensorData);
 
-        Point2D.Double position = roombaMapData.getPosition();
-        double radians = roombaMapData.getRadians();
-        double degrees = roombaMapData.getDegrees();
+        Point2D.Double position = roombaInfo.getPosition().getPosition();
+        double radians = roombaInfo.getPosition().getRadians();
+        double degrees = roombaInfo.getPosition().getDegrees();
         Assert.assertEquals(-1 * (innerRadius + (RoombaConstants.WHEELBASE / 2)), position.x, tolerance);
         Assert.assertEquals(innerRadius + (RoombaConstants.WHEELBASE / 2), position.y, tolerance);
         Assert.assertEquals(expectedRadians, radians, tolerance / 10);
@@ -158,11 +159,11 @@ public class RoombaMapDataTest {
         double expectedRadians = Math.PI * 2 / 4;
         setEncoderCounts(innerRadius, expectedRadians, true, true);
         sensorData = new SensorData(byteArray, SensorData.MAX_SENSOR_BYTES);
-        roombaMapData.processSensorData(sensorData);
+        RoombaInfo roombaInfo = roombaMapData.processSensorData(sensorData);
 
-        Point2D.Double position = roombaMapData.getPosition();
-        double radians = roombaMapData.getRadians();
-        double degrees = roombaMapData.getDegrees();
+        Point2D.Double position = roombaInfo.getPosition().getPosition();
+        double radians = roombaInfo.getPosition().getRadians();
+        double degrees = roombaInfo.getPosition().getDegrees();
         Assert.assertEquals(innerRadius + (RoombaConstants.WHEELBASE / 2), position.x, tolerance);
         Assert.assertEquals(-1 * (innerRadius + (RoombaConstants.WHEELBASE / 2)), position.y, tolerance);
         Assert.assertEquals(expectedRadians, radians, tolerance / 10);
@@ -179,11 +180,11 @@ public class RoombaMapDataTest {
         double expectedRadians = Math.PI * -2 / 4;
         setEncoderCounts(innerRadius, expectedRadians, false, true);
         sensorData = new SensorData(byteArray, SensorData.MAX_SENSOR_BYTES);
-        roombaMapData.processSensorData(sensorData);
+        RoombaInfo roombainfo = roombaMapData.processSensorData(sensorData);
 
-        Point2D.Double position = roombaMapData.getPosition();
-        double radians = roombaMapData.getRadians();
-        double degrees = roombaMapData.getDegrees();
+        Point2D.Double position = roombainfo.getPosition().getPosition();
+        double radians = roombainfo.getPosition().getRadians();
+        double degrees = roombainfo.getPosition().getDegrees();
         Assert.assertEquals(-1 * (innerRadius + (RoombaConstants.WHEELBASE / 2)), position.x, tolerance);
         Assert.assertEquals(-1 * (innerRadius + (RoombaConstants.WHEELBASE / 2)), position.y, tolerance);
         Assert.assertEquals(expectedRadians, radians, tolerance / 10);
