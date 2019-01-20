@@ -1,5 +1,5 @@
 /*
- *  SmartRoomba - DataCSV
+ *  SmartRoomba - DataCSVWriter
  *
  *  Copyright (c) 2018 Jon Gelderloos
  *
@@ -27,11 +27,11 @@ import com.jgelderloos.smartroomba.roomba.SensorData;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class DataCSV {
+public class DataCSVWriter {
     private FileWriter fileWriter;
     private boolean isHeaderWritten = false;
 
-    public DataCSV(FileWriter fileWriter) {
+    public DataCSVWriter(FileWriter fileWriter) {
         this.fileWriter = fileWriter;
     }
 

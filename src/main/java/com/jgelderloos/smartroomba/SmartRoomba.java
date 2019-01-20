@@ -29,7 +29,7 @@ import com.jgelderloos.smartroomba.roomba.RoombaUtilities;
 import com.jgelderloos.smartroomba.roomba.SensorData;
 import com.jgelderloos.smartroomba.roombacomm.RoombaComm;
 import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
-import com.jgelderloos.smartroomba.utilities.DataCSV;
+import com.jgelderloos.smartroomba.utilities.DataCSVWriter;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -42,17 +42,17 @@ public class SmartRoomba implements Runnable {
     private RoombaComm roombaComm;
     private String comPort;
     private int pauseTime;
-    private DataCSV dataCSV;
+    private DataCSVWriter dataCSVWriter;
     private Queue<RoombaInfo> roombaInfoQueue;
     private RoombaUtilities roombaUtilities;
     private RoombaMapData roombaMapData;
 
     public SmartRoomba(RoombaComm roombaComm, String comPort, int pauseTime, boolean debug, boolean hwHandshake,
-           DataCSV dataCSV, Queue<RoombaInfo> roombaInfoQueue) {
+                       DataCSVWriter dataCSVWriter, Queue<RoombaInfo> roombaInfoQueue) {
         this.roombaComm = roombaComm;
         this.comPort = comPort;
         this.pauseTime = pauseTime;
-        this.dataCSV = dataCSV;
+        this.dataCSVWriter = dataCSVWriter;
         this.roombaInfoQueue = roombaInfoQueue;
         this.roombaUtilities = new RoombaUtilities();
         this.roombaMapData = new RoombaMapData();
@@ -108,7 +108,7 @@ public class SmartRoomba implements Runnable {
                     System.out.println("Sensor Data: " + dataCount + " " + lastSensorUpdate.toString());
                     System.out.println(sensorData.getRawDataAsCSVString());
                     processData(sensorData);
-                    dataCSV.writeData(sensorData);
+                    dataCSVWriter.writeData(sensorData);
                     dataCount++;
                 } else {
                     dataAvailable = false;
@@ -127,7 +127,7 @@ public class SmartRoomba implements Runnable {
 
         }
         System.out.println("Disconnecting");
-        dataCSV.close();
+        dataCSVWriter.close();
         roombaComm.disconnect();
 
         System.out.println("Done");

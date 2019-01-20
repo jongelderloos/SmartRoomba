@@ -13,17 +13,17 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
-public class DataCSVTest {
-    private DataCSV dataCSV;
+public class DataCSVWriterTest {
+    private DataCSVWriter dataCSVWriter;
 
     @Test
     public void nullFileWriter() {
-        dataCSV = new DataCSV(null);
+        dataCSVWriter = new DataCSVWriter(null);
 
-        boolean result = dataCSV.writeData(mock(SensorData.class));
+        boolean result = dataCSVWriter.writeData(mock(SensorData.class));
         Assert.assertFalse(result);
 
-        result = dataCSV.close();
+        result = dataCSVWriter.close();
         Assert.assertFalse(result);
     }
 
@@ -34,11 +34,11 @@ public class DataCSVTest {
         doReturn(fileWriter).when(fileWriter).append(any(CharSequence.class));
         doReturn(LocalDateTime.now()).when(sensorData).getDateTime();
 
-        dataCSV = new DataCSV(fileWriter);
+        dataCSVWriter = new DataCSVWriter(fileWriter);
 
-        boolean result = dataCSV.writeData(sensorData);
+        boolean result = dataCSVWriter.writeData(sensorData);
         Assert.assertTrue(result);
-        result = dataCSV.writeData(sensorData);
+        result = dataCSVWriter.writeData(sensorData);
         Assert.assertTrue(result);
     }
 
@@ -48,9 +48,9 @@ public class DataCSVTest {
         SensorData sensorData = mock(SensorData.class);
         doThrow(new IOException()).when(fileWriter).append(any(CharSequence.class));
 
-        dataCSV = new DataCSV(fileWriter);
+        dataCSVWriter = new DataCSVWriter(fileWriter);
 
-        boolean result = dataCSV.writeData(sensorData);
+        boolean result = dataCSVWriter.writeData(sensorData);
         Assert.assertFalse(result);
     }
 
@@ -61,9 +61,9 @@ public class DataCSVTest {
         doReturn(LocalDateTime.now()).when(sensorData).getDateTime();
         doThrow(new IOException()).when(fileWriter).append(",");
 
-        dataCSV = new DataCSV(fileWriter);
+        dataCSVWriter = new DataCSVWriter(fileWriter);
 
-        boolean result = dataCSV.writeData(sensorData);
+        boolean result = dataCSVWriter.writeData(sensorData);
         Assert.assertFalse(result);
     }
 
@@ -72,9 +72,9 @@ public class DataCSVTest {
         FileWriter fileWriter = mock(FileWriter.class);
         doThrow(new IOException()).when(fileWriter).close();
 
-        dataCSV = new DataCSV(fileWriter);
+        dataCSVWriter = new DataCSVWriter(fileWriter);
 
-        boolean result = dataCSV.close();
+        boolean result = dataCSVWriter.close();
         Assert.assertFalse(result);
     }
 

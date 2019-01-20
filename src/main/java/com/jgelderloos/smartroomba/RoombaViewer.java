@@ -26,7 +26,7 @@ import com.jgelderloos.smartroomba.roomba.RoombaConstants;
 import com.jgelderloos.smartroomba.roomba.RoombaInfo;
 import com.jgelderloos.smartroomba.roomba.RoombaUtilities;
 import com.jgelderloos.smartroomba.roombacomm.RoombaCommPlaybackMode;
-import com.jgelderloos.smartroomba.utilities.DataCSV;
+import com.jgelderloos.smartroomba.utilities.DataCSVWriter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,7 +56,7 @@ public class RoombaViewer {
 
         String comport = "J:\\JonStuff\\Projects\\SmartRoomba\\data\\ForwardBumpTurnLeft.csv";
         ConcurrentLinkedQueue<RoombaInfo> roombaInfoQueue = new ConcurrentLinkedQueue<>();
-        SmartRoomba smartRoomba = new SmartRoomba(new RoombaCommPlaybackMode(), comport, 100, false, false, new DataCSV(null), roombaInfoQueue);
+        SmartRoomba smartRoomba = new SmartRoomba(new RoombaCommPlaybackMode(), comport, 100, false, false, new DataCSVWriter(null), roombaInfoQueue);
         Thread smartRoombaThread = new Thread(smartRoomba);
         smartRoombaThread.start();
 
