@@ -51,32 +51,35 @@ public class DataCSV {
                 }
             } catch (IOException e) {
                 System.out.println("IOException while writing CSV data to file");
+                close();
             }
         }
         return wasSuccess;
     }
 
-    public  void close() {
+    public boolean close() {
+        boolean wasSuccess = false;
         try {
             if (fileWriter != null) {
                 fileWriter.close();
+                wasSuccess = true;
             }
         } catch (IOException e) {
             System.out.println("IOException while closing CSV data file");
         }
+        return wasSuccess;
     }
 
     private boolean writeHeader(SensorData data) {
         boolean wasSuccess = false;
-        if (fileWriter != null) {
-            try {
-                fileWriter.append("TIME,");
-                fileWriter.append(data.getDataHeaderAsCSVString());
-                fileWriter.append("\n");
-                wasSuccess = true;
-            } catch (IOException e) {
-                System.out.println("IOException while writing CSV header to file");
-            }
+        try {
+            fileWriter.append("TIME,");
+            fileWriter.append(data.getDataHeaderAsCSVString());
+            fileWriter.append("\n");
+            wasSuccess = true;
+        } catch (IOException e) {
+            System.out.println("IOException while writing CSV header to file");
+            close();
         }
         return wasSuccess;
     }

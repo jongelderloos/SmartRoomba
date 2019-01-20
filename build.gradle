@@ -30,6 +30,7 @@ dependencies {
 
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.1.0'
 }
 
 // In this section you declare where to find the dependencies of your project
