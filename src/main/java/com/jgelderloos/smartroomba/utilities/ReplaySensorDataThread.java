@@ -38,9 +38,13 @@ public class ReplaySensorDataThread implements Runnable {
     }
 
     public void run() {
+        if (sensorDataQueue == null || replayDataQueue == null) {
+            return;
+        }
+
         LocalDateTime dataStartTime = null;
         LocalDateTime startTime = LocalDateTime.now();
-        while (replayDataQueue.size() > 0) {
+        while (!replayDataQueue.isEmpty()) {
             SensorData replayData = replayDataQueue.poll();
             if (dataStartTime == null) {
                 dataStartTime = replayData.getDateTime();
