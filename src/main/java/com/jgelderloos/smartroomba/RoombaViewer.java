@@ -27,6 +27,8 @@ import com.jgelderloos.smartroomba.roomba.RoombaInfo;
 import com.jgelderloos.smartroomba.roomba.RoombaUtilities;
 import com.jgelderloos.smartroomba.roombacomm.RoombaCommPlaybackMode;
 import com.jgelderloos.smartroomba.utilities.DataCSVWriter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,6 +44,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class RoombaViewer {
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static void main(String[] args) {
         RoombaUtilities roombaUtilities = new RoombaUtilities();
@@ -76,8 +79,7 @@ public class RoombaViewer {
     }
 
     private static void createAndShowGUI(MainPanel panel) {
-
-        System.out.println("Created GUI on EDT? " + SwingUtilities.isEventDispatchThread());
+        LOGGER.info("Created GUI on EDT? {}", SwingUtilities.isEventDispatchThread());
         JFrame frame = new JFrame("Smart Roomba");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(panel);

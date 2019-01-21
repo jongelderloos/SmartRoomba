@@ -30,6 +30,8 @@ import com.jgelderloos.smartroomba.roomba.SensorData;
 import com.jgelderloos.smartroomba.roombacomm.RoombaComm;
 import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
 import com.jgelderloos.smartroomba.utilities.DataCSVWriter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -39,6 +41,7 @@ import java.util.Queue;
 import static com.jgelderloos.smartroomba.roomba.RoombaConstants.SensorPacketGroup.P100;
 
 public class SmartRoomba implements Runnable {
+    private static final Logger LOGGER = LogManager.getLogger();
     private RoombaComm roombaComm;
     private String comPort;
     private int pauseTime;
@@ -70,26 +73,26 @@ public class SmartRoomba implements Runnable {
 
     public void run() {
         if (!roombaComm.connect(comPort)) {
-            System.out.println("Couldn't connect to "+ comPort);
+            LOGGER.info("Couldn't conect to {}", comPort);
             return;
         }
 
-        System.out.println("Roomba startup");
+        LOGGER.info("Roomba startup");
         //roombaComm.startup();
         roombaComm.send(OpCodes.START.getId());
 
-        System.out.println("Press return to exit.");
+        LOGGER.info("Press return to exit");
         int dataCount = 1;
         LocalDateTime lastSensorUpdate = LocalDateTime.now();
         boolean running = true;
         while (running) {
             try {
                 if (System.in.available() != 0) {
-                    System.out.println("key pressed");
+                    LOGGER.info("Key pressed");
                     running = false;
                 }
             } catch (IOException ioe) {
-                System.out.println("IOException while reading keyboard input");
+                LOGGER.error("Exception while reading keyboard input");
             }
 
             // TODO: use Stream instead of always requesting packets
@@ -105,8 +108,8 @@ public class SmartRoomba implements Runnable {
                 SensorData sensorData = roombaComm.getSensorDataQueue().poll();
                 if (sensorData != null) {
                     lastSensorUpdate = LocalDateTime.now();
-                    System.out.println("Sensor Data: " + dataCount + " " + lastSensorUpdate.toString());
-                    System.out.println(sensorData.getRawDataAsCSVString());
+                    LOGGER.debug("Sensor Data: {} {}", dataCount, lastSensorUpdate);
+                    LOGGER.debug(sensorData.getRawDataAsCSVString());
                     processData(sensorData);
                     dataCSVWriter.writeData(sensorData);
                     dataCount++;
@@ -120,23 +123,23 @@ public class SmartRoomba implements Runnable {
             long sensorCheckInterval = 5000;
             if (timeWithoutSensor > sensorCheckInterval) {
                 lastSensorUpdate = LocalDateTime.now();
-                System.out.println("No sensor data in over " + sensorCheckInterval/1000 + " seconds. Make sure the Roomba is on.");
+                LOGGER.info("No sensor data in over {} seconds. Make sure the Roomba is on.", sensorCheckInterval/1000);
             }
 
             roombaUtilities.sleep(pauseTime, "waiting for DSR");
 
         }
-        System.out.println("Disconnecting");
+        LOGGER.info("Disconnecting");
         dataCSVWriter.close();
         roombaComm.disconnect();
 
-        System.out.println("Done");
+        LOGGER.info("Done");
     }
 
     private void processData(SensorData sensorData) {
         if (!isSafeToContinue(sensorData)) {
             roombaComm.send(OpCodes.START.getId());
-            System.out.println("Unsafe condition detected by sensors. Stopping Roomba");
+            LOGGER.warn("Unsafe condition detected by sensors. Stopping Roomba");
         } else {
             RoombaInfo roombaInfo = roombaMapData.processSensorData(sensorData);
             roombaInfoQueue.add(roombaInfo);

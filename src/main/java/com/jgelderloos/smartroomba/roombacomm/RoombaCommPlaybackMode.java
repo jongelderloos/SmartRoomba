@@ -3,6 +3,8 @@ package com.jgelderloos.smartroomba.roombacomm;
 import com.jgelderloos.smartroomba.roomba.SensorData;
 import com.jgelderloos.smartroomba.utilities.DataCSVReader;
 import com.jgelderloos.smartroomba.utilities.ReplaySensorDataThread;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -15,6 +17,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class RoombaCommPlaybackMode extends RoombaComm {
+    private static final Logger LOGGER = LogManager.getLogger(RoombaCommSerial.class);
     private Queue<SensorData> sensorDataQueue;
     private Queue<SensorData> fileDataQueue;
     private DataCSVReader dataCSVReader;
@@ -44,10 +47,10 @@ public class RoombaCommPlaybackMode extends RoombaComm {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(portId))) {
             dataCSVReader = new DataCSVReader(bufferedReader);
             fileData = dataCSVReader.readData();
-        } catch (FileNotFoundException ex) {
-            System.out.println("FileNotFoundException. Could not find file: " + portId);
-        } catch (IOException ex) {
-            System.out.println("IOException. Could not close file: " + portId);
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Could not find file. {}", portId, e);
+        } catch (IOException e) {
+            LOGGER.error("Could not close file. {}", portId, e);
         }
 
         boolean isFirstLine = true;

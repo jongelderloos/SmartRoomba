@@ -23,11 +23,14 @@
 package com.jgelderloos.smartroomba.utilities;
 
 import com.jgelderloos.smartroomba.roomba.SensorData;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileWriter;
 import java.io.IOException;
 
 public class DataCSVWriter {
+    private static final Logger LOGGER = LogManager.getLogger(DataCSVWriter.class);
     private FileWriter fileWriter;
     private boolean isHeaderWritten = false;
 
@@ -50,7 +53,7 @@ public class DataCSVWriter {
                     wasSuccess = true;
                 }
             } catch (IOException e) {
-                System.out.println("IOException while writing CSV data to file");
+                LOGGER.error("Error while writing CSV data. {}", e);
                 close();
             }
         }
@@ -65,7 +68,7 @@ public class DataCSVWriter {
                 wasSuccess = true;
             }
         } catch (IOException e) {
-            System.out.println("IOException while closing CSV data file");
+            LOGGER.error("Error while closing CSV data file. {}", e);
         }
         return wasSuccess;
     }
@@ -78,7 +81,7 @@ public class DataCSVWriter {
             fileWriter.append("\n");
             wasSuccess = true;
         } catch (IOException e) {
-            System.out.println("IOException while writing CSV header to file");
+            LOGGER.error("Error while writing CSV header to file. {}", e);
             close();
         }
         return wasSuccess;

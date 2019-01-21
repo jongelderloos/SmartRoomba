@@ -23,8 +23,12 @@
 
 package com.jgelderloos.smartroomba.roombacomm;
 
+import com.jgelderloos.smartroomba.roomba.RoombaUtilities;
 import com.jgelderloos.smartroomba.roomba.SensorData;
 import gnu.io.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -50,6 +54,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class RoombaCommSerial extends RoombaComm implements SerialPortEventListener
 {
+    private static final Logger LOGGER = LogManager.getLogger(RoombaCommSerial.class);
+    private RoombaUtilities roombaUtilities;
     private int           rate = 57600;
     static final int databits = 8;
     static final int parity   = SerialPort.PARITY_NONE;
@@ -127,6 +133,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
         // TODO: fix config file
         //readConfigFile();
         sensorDataQueue = new ConcurrentLinkedQueue<>();
+        roombaUtilities = new RoombaUtilities();
     }
 
     /*
@@ -181,11 +188,16 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
             if (input != null) {
                 input.close();
             }
+        } catch (IOException e) {
+            LOGGER.error("Error closing input. ", e);
+        }
+
+        try {
             if (output != null) {
                 output.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error closing output. ", e);
         }
         input = null;
         output = null;
@@ -207,7 +219,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
                 output.flush();   // hmm, not sure if a good idea
             }
         } catch (IOException e) { // null pointer or serial port dead
-            e.printStackTrace();
+            LOGGER.error("Error writing to output. ", e);
         }
         return true;
     }
@@ -223,7 +235,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
                 output.flush();   // hmm, not sure if a good idea
             }
         } catch (IOException e) { // null pointer or serial port dead
-            e.printStackTrace();
+            LOGGER.error("Error writing to output. ", e);
         }
         return true;
     }
@@ -373,7 +385,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
 			rate = 115200;
 		}
 		this.protocol = protocol;
-		logmsg("Protocol: " + protocol);
+        LOGGER.info("Protocol: {}", protocol);
 		//writeConfigFile(portname, protocol, waitForDSR?'Y':'N');
 	}
 
@@ -392,7 +404,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
 	
 	public void setPortname(String p) {
 		portname = p;
-		logmsg("Port: " + portname);
+        LOGGER.info("Port: {}", portname);
 		//writeConfigFile(portname, protocol, waitForDSR?'Y':'N');
 
 	}
@@ -412,27 +424,23 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
             while (portList.hasMoreElements()) {
                 CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
                 if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-                    System.out.println("found " + portId.getName());
+                    LOGGER.debug("Found port: {}", portId.getName());
                     if (portId.getName().equals(portname)) {
-                        logmsg("open_port:"+ portId.getName());
+                        LOGGER.debug("Open port: {}", portId.getName());
                         port = (SerialPort)portId.open("roomba serial", 2000);
                         input  = port.getInputStream();
                         output = port.getOutputStream();
                         port.setSerialPortParams(rate,databits,stopbits,parity);
                         port.addEventListener(this);
                         port.notifyOnDataAvailable(true);
-                        logmsg("port "+portname+" opened successfully");
+                        LOGGER.debug("Port {} open successfully", portname);
 
                         if( waitForDSR ) {
                             int i=40;
                             while( !port.isDSR() && i-- != 0) {
-                                logmsg("DSR not ready yet");
+                                LOGGER.debug("DSR not ready yet");
                                 //pause(150); // 150*40 = 6 seconds
-                                try {
-                                    Thread.sleep(150);
-                                } catch (Exception e) {
-                                    logmsg("Exception sleeping while wait for DSR");
-                                }
+                                roombaUtilities.sleep(150, "waiting for DSR in open_port");
                             }
                             success = port.isDSR();
                         } else {
@@ -442,7 +450,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
                 }
             }
         } catch (Exception e) {
-            logmsg("connect failed: "+e);
+            LOGGER.error("Exception caught in open_port. ", e);
             port = null;
             input = null;
             output = null;
@@ -457,9 +465,10 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
      */
     synchronized public void serialEvent(SerialPortEvent serialEvent) {
         try {
-            logmsg("serialEvent:"+serialEvent+", available:"+input.available());
+            LOGGER.debug("SerialEvent: {}, available: {}", serialEvent, input.available());
             if (serialEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
                 logmsg("data available");
+                LOGGER.debug("Data available");
                 // input.available does not always add up to the total bytes being read, sometime more data becomes available
                 // during the while loop
                 while (input.available() > 0) {
@@ -476,7 +485,8 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
                 }
             }
         } catch (IOException e) {
-            errorMessage("serialEvent", e);
+            LOGGER.error("Exception caught in serialEvent. ", e);
+            throw new RuntimeException("Error inside serialEvent");
         }
     }
     

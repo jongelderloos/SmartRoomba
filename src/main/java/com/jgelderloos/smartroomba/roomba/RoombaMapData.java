@@ -24,10 +24,13 @@ package com.jgelderloos.smartroomba.roomba;
 
 import com.jgelderloos.smartroomba.roomba.RoombaConstants.Direction;
 import com.jgelderloos.smartroomba.roomba.RoombaConstants.Side;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.geom.Point2D;
 
 public class RoombaMapData {
+    private static final Logger LOGGER = LogManager.getLogger();
     private Point2D.Double position = new Point2D.Double(0, 0);
     private double radians = 0;
     private int lastLeftEncoderCount = 0;
@@ -54,16 +57,15 @@ public class RoombaMapData {
             double changeInRightDistance = roombaUtilities.getMilimetersFromEncoderCounts(changeInRightEncoderCounts);
 
             if ((changeInLeftDistance + changeInRightDistance) / 2 != distance) {
-                System.out.println("Detected difference in encoder counts and distance. Left distance: " +
-                        changeInLeftDistance + ", right distance: " + changeInRightDistance + ", total distance: " +
-                        distance);
+                LOGGER.debug("Detected difference in encoder counts and distance. Left distance: {}, right distance: {}, total distance: {}",
+                        changeInLeftDistance, changeInRightDistance, distance);
             }
 
             double changeInRadians = roombaUtilities.getRadiansFromWheelDistance(changeInLeftDistance, changeInRightDistance);
 
             if (sensorAngle != changeInRadians) {
-                System.out.println("Detected difference in calculated angle and sensor angle. Calculated change in angle: " +
-                        changeInRadians + ", sensor angle: " + sensorAngle);
+                LOGGER.debug("Detected difference in calculated angle and sensor angle. Calculated change in angle: {} sensor angle: {}",
+                        changeInRadians, sensorAngle);
             }
 
             double changeInStraightDistance = changeInLeftDistance;
@@ -119,7 +121,7 @@ public class RoombaMapData {
                 double changeInY = roombaUtilities.getNearSideLength(radians, changeInStraightDistance);
                 position.setLocation(position.getX() + changeInX, position.getY() + changeInY);
             }
-            System.out.println("Position updated to: " + position.toString() + ", radians: " + radians + ", degrees: " + Math.toDegrees(radians));
+            LOGGER.debug("Position updated to: {} radians: {}, degrees: {}", position.toString(), radians, Math.toDegrees(radians));
         }
         return new RoombaInfo(new RoombaPosition(new Point2D.Double(position.x, position.y), radians, Math.toDegrees(radians), sensorData.getDateTime()), sensorData);
     }

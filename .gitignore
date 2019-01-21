@@ -13,6 +13,7 @@ out
 # Build Files / folders
 build
 .gradle
+logs
 
 
 # Package Files #

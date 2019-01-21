@@ -25,13 +25,15 @@ package com.jgelderloos.smartroomba.roomba;
 import com.jgelderloos.smartroomba.roomba.RoombaConstants.SensorPacketGroup;
 import com.jgelderloos.smartroomba.roomba.RoombaConstants.Direction;
 import com.jgelderloos.smartroomba.roomba.RoombaConstants.Side;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
 
 public class RoombaUtilities {
-
+    private static final Logger LOGGER = LogManager.getLogger(RoombaUtilities.class);
     private Map<SensorPacketGroup,Integer> sensorPackSizeMap;
 
     public RoombaUtilities() {
@@ -53,8 +55,8 @@ public class RoombaUtilities {
     public void sleep(int millis, String whileString) {
         try {
             Thread.sleep(millis);
-        } catch (InterruptedException ex) {
-            System.out.println("InterruptedException sleeping while " + whileString);
+        } catch (InterruptedException e) {
+            LOGGER.info("Error sleeping while {}.", whileString, e);
             Thread.currentThread().interrupt();
         }
     }

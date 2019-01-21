@@ -33,12 +33,15 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SmartRoombaMain {
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static void main(String[] args) {
         Options options = new Options();
@@ -70,7 +73,7 @@ public class SmartRoombaMain {
         try {
             cmd = parser.parse(options, args);
         } catch (ParseException e) {
-            System.out.println(e.getMessage());
+            LOGGER.error("Exception parsing arguments. ", e);
             formatter.printHelp("SmartRoomba", options);
 
             System.exit(1);
@@ -87,7 +90,7 @@ public class SmartRoombaMain {
             try {
                 pauseTime = Integer.parseInt(pause);
             } catch (NumberFormatException e) {
-                System.out.println("pause must be an integer value. See usage for details");
+                LOGGER.error("Pause must be an integer value. See usage for details", e);
             }
 
             FileWriter fileWriter = null;
@@ -96,7 +99,7 @@ public class SmartRoombaMain {
                     fileWriter = new FileWriter(record);
                 }
             } catch (IOException e) {
-                System.out.println("Error, could not open the file for writing. " + record);
+                LOGGER.error("Could not open the file for writing. {}", record, e);
             }
             DataCSVWriter dataCSVWriter = new DataCSVWriter(fileWriter);
             RoombaComm roombaComm;

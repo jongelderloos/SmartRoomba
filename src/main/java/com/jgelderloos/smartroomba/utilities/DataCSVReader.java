@@ -22,12 +22,16 @@
 
 package com.jgelderloos.smartroomba.utilities;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DataCSVReader {
+    private static final Logger LOGGER = LogManager.getLogger(DataCSVReader.class);
     private BufferedReader bufferedReader;
 
     public DataCSVReader() {
@@ -46,8 +50,8 @@ public class DataCSVReader {
                 while ((line = bufferedReader.readLine()) != null) {
                     fileLines.add(line);
                 }
-            } catch (IOException ex) {
-                System.out.println("IOException while reading CSV data");
+            } catch (IOException e) {
+                LOGGER.error("Error while reading CSV data. {}", e);
             }
         }
         return fileLines;
