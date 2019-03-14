@@ -26,6 +26,7 @@ import com.jgelderloos.smartroomba.roomba.RoombaConstants;
 import com.jgelderloos.smartroomba.roomba.RoombaInfo;
 import com.jgelderloos.smartroomba.roomba.RoombaUtilities;
 import com.jgelderloos.smartroomba.roombacomm.RoombaCommPlaybackMode;
+import com.jgelderloos.smartroomba.roombacomm.RoombaCommSerial;
 import com.jgelderloos.smartroomba.utilities.DataCSVWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +38,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -57,14 +59,17 @@ public class RoombaViewer {
             }
         });
 
-        String comport = "J:\\JonStuff\\Projects\\SmartRoomba\\data\\ForwardBumpTurnLeft.csv";
+        // TODO: the GUI should have a panel/dialog to set information like comport, record, delay
+        //String comport = "J:\\JonStuff\\Projects\\SmartRoomba\\data\\ForwardBumpTurnLeft.csv";
+        String comport = "COM12";
         ConcurrentLinkedQueue<RoombaInfo> roombaInfoQueue = new ConcurrentLinkedQueue<>();
-        SmartRoomba smartRoomba = new SmartRoomba(new RoombaCommPlaybackMode(), comport, 100, false, false, new DataCSVWriter(null), roombaInfoQueue);
+        //SmartRoomba smartRoomba = new SmartRoomba(new RoombaCommPlaybackMode(), comport, 100, false, false, new DataCSVWriter(null), roombaInfoQueue);
+        SmartRoomba smartRoomba = new SmartRoomba(new RoombaCommSerial(), comport, 100, false, false, new DataCSVWriter(null), roombaInfoQueue);
         Thread smartRoombaThread = new Thread(smartRoomba);
         smartRoombaThread.start();
 
-        int retry = 0;
-        while (retry < 10) {
+        boolean running = true;
+        while (running) {
             RoombaInfo roombaInfo = roombaInfoQueue.poll();
             if (roombaInfo != null) {
                 panel.addRoombaInfo(roombaInfo);
@@ -72,7 +77,6 @@ public class RoombaViewer {
                 roombaUtilities.sleep(100, "waiting for data in RoombaViewer");
             } else {
                 roombaUtilities.sleep(500, "waiting for data in RoombaViewer");
-                retry++;
             }
         }
 
@@ -219,15 +223,17 @@ class MainPanel extends JPanel {
         int positionY = 5;
         int angleX = 5;
         int angleY = positionY + graphics.getFontMetrics().getHeight();
-        String positionString = "Roomba position: " + formatter.format(roombaInfoList.get(currentRoombaInfoIndex).getPosition().getPosition().x)
-                + ", " + formatter.format(roombaInfoList.get(currentRoombaInfoIndex).getPosition().getPosition().y);
-        String angleString = "Roomba angle: " + formatter.format(roombaInfoList.get(currentRoombaInfoIndex).getPosition().getDegrees()) + "\u00b0";
-        graphics.setColor(Color.WHITE);
-        graphics.fillRect(positionX, positionY, graphics.getFontMetrics().stringWidth(positionString) + 4, graphics.getFontMetrics().getHeight());
-        graphics.fillRect(angleX, angleY, graphics.getFontMetrics().stringWidth(angleString) + 4, graphics.getFontMetrics().getHeight());
-        graphics.setColor(Color.BLACK);
-        graphics.drawString(positionString, positionX + 2, positionY + graphics.getFontMetrics().getHeight() - 3);
-        graphics.drawString(angleString, angleX + 2, angleY + graphics.getFontMetrics().getHeight() - 3);
+        if (!roombaInfoList.isEmpty()) {
+            String positionString = "Roomba position: " + formatter.format(roombaInfoList.get(currentRoombaInfoIndex).getPosition().getPosition().x)
+                    + ", " + formatter.format(roombaInfoList.get(currentRoombaInfoIndex).getPosition().getPosition().y);
+            String angleString = "Roomba angle: " + formatter.format(roombaInfoList.get(currentRoombaInfoIndex).getPosition().getDegrees()) + "\u00b0";
+            graphics.setColor(Color.WHITE);
+            graphics.fillRect(positionX, positionY, graphics.getFontMetrics().stringWidth(positionString) + 4, graphics.getFontMetrics().getHeight());
+            graphics.fillRect(angleX, angleY, graphics.getFontMetrics().stringWidth(angleString) + 4, graphics.getFontMetrics().getHeight());
+            graphics.setColor(Color.BLACK);
+            graphics.drawString(positionString, positionX + 2, positionY + graphics.getFontMetrics().getHeight() - 3);
+            graphics.drawString(angleString, angleX + 2, angleY + graphics.getFontMetrics().getHeight() - 3);
+        }
     }
 
     private void paintScaleText(Graphics graphics) {
@@ -287,7 +293,9 @@ class MainPanel extends JPanel {
         for (RoombaInfo roombaInfo : roombaInfoList) {
             paintObstacles(graphics, roombaInfo);
         }
-        paintFocusedRoomba(graphics, roombaInfoList.get(currentRoombaInfoIndex));
+        if (!roombaInfoList.isEmpty()) {
+            paintFocusedRoomba(graphics, roombaInfoList.get(currentRoombaInfoIndex));
+        }
     }
 
     private void paintRoombaShadow(Graphics graphics, RoombaInfo roombaInfo) {

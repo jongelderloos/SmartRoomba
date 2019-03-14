@@ -39,6 +39,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.regex.Pattern;
 
 public class SmartRoombaMain {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -103,10 +104,10 @@ public class SmartRoombaMain {
             }
             DataCSVWriter dataCSVWriter = new DataCSVWriter(fileWriter);
             RoombaComm roombaComm;
-            try {
-                Integer.parseInt(comport);
+            Pattern comPortPattern = Pattern.compile("COM\\d+");
+            if (comPortPattern.matcher(comport).matches()) {
                 roombaComm = new RoombaCommSerial();
-            } catch (NumberFormatException ex) {
+            } else {
                 roombaComm = new RoombaCommPlaybackMode();
             }
 

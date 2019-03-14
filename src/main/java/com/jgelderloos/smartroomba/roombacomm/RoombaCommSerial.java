@@ -56,7 +56,7 @@ public class RoombaCommSerial extends RoombaComm implements SerialPortEventListe
 {
     private static final Logger LOGGER = LogManager.getLogger(RoombaCommSerial.class);
     private RoombaUtilities roombaUtilities;
-    private int           rate = 57600;
+    private int rate = 115200;
     static final int databits = 8;
     static final int parity   = SerialPort.PARITY_NONE;
     static final int stopbits = SerialPort.STOPBITS_1;
